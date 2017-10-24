@@ -1,0 +1,11 @@
+spec:
+  template:
+    spec:
+      volumes:
+      - name: ${artifactId}-logs
+        persistentVolumeClaim:
+          claimName: ${artifactId}-logs
+      containers:
+      - volumeMounts:
+        - mountPath: /vertx/data/
+          name: ${artifactId}-logs

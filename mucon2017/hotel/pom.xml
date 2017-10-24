@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.jboss.narayana.quickstart.stm</groupId>
+  <artifactId>stm-vertx-demo-hotel</artifactId>
+  <version>1.0-SNAPSHOT</version>
+
+  <properties>
+    <maven.compiler.source>1.8</maven.compiler.source>
+    <maven.compiler.target>1.8</maven.compiler.target>
+
+    <vertx.version>3.4.1</vertx.version>
+    <narayana.version>5.7.1.Final-SNAPSHOT</narayana.version>
+    <jboss-logging.version>3.1.4.GA</jboss-logging.version>
+
+    <demo.verticle>pom property demo.verticle must set in a profile</demo.verticle>
+
+    <vertx.verticle>${demo.verticle}</vertx.verticle>
+    <vertx.launcher>${demo.verticle}</vertx.launcher>
+
+    <exec.mainClass>${demo.verticle}</exec.mainClass>
+  </properties>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>io.vertx</groupId>
+        <artifactId>vertx-dependencies</artifactId>
+        <version>${vertx.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+  <dependencies>
+    <dependency>
+      <groupId>io.vertx</groupId>
+      <artifactId>vertx-core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.vertx</groupId>
+      <artifactId>vertx-web</artifactId>
+    </dependency>
+
+    <!-- STM dependencies -->
+    <dependency>
+      <groupId>org.jboss.narayana.stm</groupId>
+      <artifactId>stm</artifactId>
+      <version>${narayana.version}</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jboss.logging</groupId>
+      <artifactId>jboss-logging</artifactId>
+      <version>${jboss-logging.version}</version>
+      <scope>compile</scope>
+    </dependency>
+
+    <!-- Demo dependencies -->
+    <dependency>
+      <groupId>org.jboss.narayana.quickstart.stm</groupId>
+      <artifactId>stm-vertx-demo-common</artifactId>
+      <version>${project.version}</version>
+      <scope>compile</scope>
+    </dependency>
+
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>1.8</source>
+          <target>1.8</target>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+  <profiles>
+    <profile>
+      <id>openshift</id>
+      <properties>
+          <demo.verticle>demo.hotel.api.PersistentSharedHotelVerticle</demo.verticle>
+
+          <vertx.verticle>${demo.verticle}</vertx.verticle>
+          <vertx.launcher>${demo.verticle}</vertx.launcher>
+
+      </properties>
+      <build>
+        <plugins>
+            <plugin>
+                <groupId>io.fabric8</groupId>
+                <artifactId>vertx-maven-plugin</artifactId>
+                <version>1.0.6</version>
+                <executions>
+                    <execution>
+                        <id>vmp-init-package</id>
+                        <goals>
+                            <goal>initialize</goal>
+                            <goal>package</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <redeploy>true</redeploy>
+                </configuration>
+            </plugin>
+          <plugin>
+            <groupId>io.fabric8</groupId>
+            <artifactId>fabric8-maven-plugin</artifactId>
+            <version>3.2.27</version>
+            <executions>
+              <execution>
+                <id>fmp</id>
+                <goals>
+                  <goal>resource</goal>
+                  <goal>helm</goal>
+                  <goal>build</goal>
+                </goals>
+              </execution>
+            </executions>
+            <configuration>
+              <resources>
+                <env>
+                  <JAVA_TOOL_OPTIONS>-Dport=8080 -DObjectStoreEnvironmentBean.objectStoreDir=/vertx/data -DObjectStoreEnvironmentBean.stateStore.objectStoreDir=/vertx/data -DObjectStoreEnvironmentBean.communicationStore.objectStoreDir=/vertx/data</JAVA_TOOL_OPTIONS>
+                </env>
+              </resources>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>volatile</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <properties>
+        <demo.verticle>demo.hotel.api.VolatileHotelVerticle</demo.verticle>
+      </properties>
+    </profile>
+      <profile>
+        <id>persistent</id>
+        <properties>
+          <demo.verticle>demo.hotel.api.PersistentSharedHotelVerticle</demo.verticle>
+       </properties>
+      </profile>
+  </profiles>
+</project>
