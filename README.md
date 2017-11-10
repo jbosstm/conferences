@@ -13,7 +13,7 @@ Materials: [presentation materials, including demonstration code](mucon2017)
 
 Blog: [narayana team blog post](http://jbossts.blogspot.co.uk/2017/11/software-transactional-memory-for-cloud.html)
 
-## Brno JBUG - November 2017
+## Brno JBUG - November 2017: Saga over REST for microservices
 
 Event: [JBoss User Group Brno](https://developer.jboss.org/groups/jbugcz?view=documents)
 
