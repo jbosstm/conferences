@@ -1,0 +1,14 @@
+<jboss-ejb-client xmlns="urn:jboss:ejb-client:1.2">
+
+  <client-context >
+     <ejb-receivers exclude-local-receiver="true">
+         <remoting-ejb-receiver outbound-connection-ref="remote-ejb-connection" >
+          <!-- connect-timeout="7000"
+           <channel-creation-options>
+		       <property name="org.xnio.Options.SSL_ENABLED" value="false"/>
+           </channel-creation-options>
+          -->
+       </remoting-ejb-receiver>
+     </ejb-receivers>
+     </client-context>
+</jboss-ejb-client>

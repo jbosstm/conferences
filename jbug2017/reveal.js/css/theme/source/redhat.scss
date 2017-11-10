@@ -1,0 +1,117 @@
+/**
+ * Red Hat like theme for reveal.js.
+ */
+
+
+// Default mixins and settings -----------------
+@import "../template/mixins";
+@import "../template/settings";
+// ---------------------------------------------
+
+
+// Include theme-specific fonts
+@font-face {
+    font-family: 'liberation_regular';
+    src: url('../../lib/font/liberation-sans/LiberationSans-Regular-webfont.eot');
+    src: url('../../lib/font/liberation-sans/LiberationSans-Regular-webfont.eot?#iefix') format('embedded-opentype'),
+         url('../../lib/font/liberation-sans/LiberationSans-Regular-webfont.woff') format('woff'),
+         url('../../lib/font/liberation-sans/LiberationSans-Regular-webfont.ttf') format('truetype'),
+         url('../../lib/font/liberation-sans/LiberationSans-Regular-webfont.svg#liberation_sansregular') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'liberation_bold';
+    src: url('../../lib/font/liberation-sans/LiberationSans-Bold-webfont.eot');
+    src: url('../../lib/font/liberation-sans/LiberationSans-Bold-webfont.eot?#iefix') format('embedded-opentype'),
+         url('../../lib/font/liberation-sans/LiberationSans-Bold-webfont.woff') format('woff'),
+         url('../../lib/font/liberation-sans/LiberationSans-Bold-webfont.ttf') format('truetype'),
+         url('../../lib/font/liberation-sans/LiberationSans-Bold-webfont.svg#liberation_sansbold') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+
+
+// Override theme settings (see ../template/settings.scss)
+@mixin bodyBackground() {
+	@include radial-gradient( rgba(245,245,245,1), rgba(255,255,255,1) );
+}
+
+$mainColor: #606058;
+$mainFont: liberation_regular;
+$mainFontSize: 30px;
+
+$headingColor: #781f1c;
+$headingFont: liberation_bold;
+$headingTextShadow: none;
+$headingLetterSpacing: -0.03em;
+$headingTextTransform: none;
+
+$linkColor: #606058;
+$linkColorHover: lighten( $linkColor, 20% );
+
+$selectionBackgroundColor: #f7f3dc;
+
+
+
+// Theme template ------------------------------
+@import "../template/theme";
+// ---------------------------------------------
+
+
+.reveal .progress {
+    background: rgba(200,197,172,0.3);
+}
+.reveal .progress span {
+    background: rgb(120,31,28);
+}
+
+body::before {
+    position: fixed;
+    right: 20px;
+    bottom: 18px;
+    z-index: 30;
+    content:"";
+    background-image: url('../../lib/img/redhat-color-small.png');
+    background-size: 8.5em 2.4em;
+    width: 8.5em;
+    height: 2.4em;
+}
+
+.reveal .image.noborder img {
+   border: 0;
+   background: none;
+   box-shadow: none;
+   margin: 0;
+   padding: 0;
+}
+
+// class stretch to even for code blocks
+.reveal .stretch pre {
+   width: auto;
+}
+
+.reveal .stretch code {
+   max-width: none;
+   max-height: none;
+}
+
+// define color classes
+.reveal .red {
+  color: red;
+}
+.reveal .yellow {
+  color: yellow;
+}
+.reveal .green {
+  color: green;
+}
+.reveal .blue {
+  color: blue;
+}
+.reveal .brown {
+  color: brown;
+}
+.reveal .orange {
+  color: orange;
+}

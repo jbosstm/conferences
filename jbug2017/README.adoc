@@ -1,0 +1,19 @@
+== JBUG Brno 2017-11-08
+
+* Slides by http://lab.hakim.se/reveal-js[reveal.js], the presentation
+  could be read in adoc format at link:./saga-jbug.adoc[saga-jbug.adoc].
+* There are two examples (demos).
+** The first one shows distributed transactions over WildFly 11 ejb remote calls.
+   Available at link:./jta-distributed[jta distributed wfly demo]. 
+   It requires docker being available at the system and then the `setup.sh` should
+   install the containers and deploy what's needed. You can then use `curl` to
+   query the servlet to start the transaction. You will probably need to open
+   some database viewer to show the audience the content of the table in case of
+   distributed transaction succeeded or if fails (the file 
+   link:./jta-distributed/wfly-server/src/main/java/io/narayana/ejb/TransactionEJB.java[TransactionEJB.java]
+   then could be 'update' for throwning `RuntimeException` and cause the transaction
+   being rolled-back as whole (no changes in database).
+** The other one expects to be run and shown on OpenShift and settings is described at
+   https://developer.jboss.org/wiki/MSAQuickstartsWithLRAREST-ATOnMinishift .
+   You will need a OpenShift started probably locally (check https://www.openshift.org/minishift[Minishift])
+   and run the ansible recipe from https://github.com/ochaloup/helloworld-msa/tree/lra

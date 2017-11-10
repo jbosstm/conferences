@@ -1,0 +1,270 @@
+:source-highlighter: highlightjs
+:revealjs_theme: redhat
+:revealjs_controls: false
+:revealjs_center: true
+:revealjs_transition: fade
+
+:images: ./misc
+
+
+= Saga over REST for microservices
+
+Ondra Chaloupka / ochaloup@redhat.com
+
+== !
+
+image:{images}/saga/wfly_narayana.png[role="noborder"]
+
+[NOTE.speaker]
+--
+* Red Hat (https://developers.redhat.com)
+* Wild Fly (http://wildfly.io)
+* Naryana (http://narayana.io)
+--
+
+== !
+
+image:{images}/saga/narayana_logo.png[role="noborder"]
+
+* earlier *Arjuna*, renamed to *Narayana*
+
+* *JTA* implementation in JBoss/WildFly
+* *JTS* distributed transaction over IIOP
+* webservice transactions (*WS-AT/WS-BA*)
+* *STM* for http://vertx.io[Vert.x]
+* *saga* transactions over REST
+
+== Agenda
+
+* What is meant under term _microservice_ in scope of this presentation
+* How the the distributed transactions and 2PC works
+* What is saga and why could be good fit for microservice architecture
+* What are and how to use Narayana Long Running Actions
+
+== !
+
+image::{images}/saga/kleppmann-txn-msa-quotation.png[background, size=cover]
+
+== Microservice architecture
+
+
+image:{images}/saga/posta-msa.png[role="noborder stretch"]
+
+(_credit: Christian Posta, http://blog.christianposta.com_)
+
+[NOTE.speaker]
+--
+* Martin Fowler: https://martinfowler.com/articles/microservices.html
+* Burr Sutter: https://www.youtube.com/watch?v=35_yWad7IiQ
+* Christian Posta: http://blog.christianposta.com/microservices/the-hardest-part-about-microservices-data
+--
+
+== Distributed transactions
+
+[.stretch]
+image:{images}/saga/posta-msa-with-wfly.png[role="noborder stretch"]
+
+== An ACID transaction
+
+* An atomic unit of the work where everything or nothing is finished
+** usually in regards of data manipulation
+* Protecting shared resources from multiple users
+* A notion of a global consensus
+* ACID properties guaranteed
+
+== !
+
+image:{images}/saga/test-tubes.png[role="noborder"]
+
+* [red]#A#&#144;tomicity
+* [orange]#C#&#144;onsistency
+* [green]#I#&#144;solation
+* [blue]#D#&#144;urability
+
+[NOTE.speaker]
+--
+*Atomicity*::
+  "all or nothing", all operations in a transaction succeed or every operation is rolled back
+*Consistency*::
+  on the completion of a transaction, the database is structurally sound
+  that covers e.g. preserve foreign keys, uniqueness defined by schema etc.
+*Isolation*::
+  transactions do not contend with one another. Contentious access to data is moderated by the database
+  so that transactions appear to run sequentially.
+*Durability*::
+  the results of applying a transaction are permanent, even in the presence of failures
+
+* Martin Kleppmann: https://www.youtube.com/watch?v=5ZjhNTM8XU8
+--
+
+== Distributed vs. XA transaction
+
+* distributed transaction runs over multiple services
+* XA transaction joins operations over multiple resources
+
+== XA handling
+
+image:{images}/saga/xa_handling.png[role="noborder"]
+
+
+== XA transaction: 2PC
+
+image:{images}/saga/2pc.png[role="noborder"]
+
+== Demo
+
+image:{images}/saga/posta-msa-with-wfly-xa.png[role="noborder"]
+
+[NOTE.speaker]
+--
+* XA transaction coordinates non-homogenous participants
+* scaling troubles in distributed environment
+* https://developer.jboss.org/wiki/TwoPhaseCommit2PC
+--
+
+== ACID distributed transactions: assuming
+
+* closely coupled environment
+** harder to scale
+** tight data coupling
+* short duration
+** locking reduces parallelism
+
+== Microservice architecture: expecting
+
+* loosely coupling
+* scaling
+* long duration activities
+
+== Sagas
+
+* Transactional model for long living transaction
+* Saga paper (H. Garcia-Molina, K. Salem;  1987)
+* Relaxing ACID properties
+* Eventual consistent
+
+* Web services: WS-BA specification, SOA design pattern
+* REST and event sourcing: microservices
+
+[NOTE.speaker]
+--
+Original paper talks about Saga as a solution for long-lived database transactions.
+We can use it for distributed environment too for not using two phase commit (a.k.a. locks).
+
+Other names:
+
+* Sagas
+* Saga transactions
+* Saga actions
+* Business Activities (BA)
+* Long running actions (LRA)
+* Long Living transactions (LLT)
+
+* https://www.cs.cornell.edu/andru/cs711/2002fa/reading/sagas.pdf (Princeton University, 1987)
+* http://jbossts.blogspot.cz/2017/06/sagas-and-how-they-differ-from-two.html
+* http://microservices.io/patterns/data/saga.html
+* https://www.youtube.com/watch?v=0UTOLRTwOX0 (JOTB17, Distributed Sagas: A Protocol for Coordinating Microservices, Caitie McCaffrey)
+* http://docs.oasis-open.org/ws-tx/wstx-wsba-1.1-spec-os/wstx-wsba-1.1-spec-os.html (Web Services Business Activity, 2007)
+--
+
+
+== Sagas (#2)
+
+image:{images}/saga/saga_confirm.png[role="noborder"]
+
+* consists of a sequence of autonomous operations, each immediatelly visible to outer world
+* responsibility of failures handling to developer (handlers)
+* transaction manager is responsible for calling handlers
+
+
+== Sagas (#3)
+
+image:{images}/saga/saga_compensate.png[role="noborder"]
+
+* compensation handler defined by developer, called by transaction manager
+
+
+== Saga transaction
+
+image:{images}/saga/saga.png[role="noborder"]
+
+[NOTE.speaker]
+--
+The concept of the original paper talks about single node database but it could
+be applied to distributed transactions (as was already shown).
+
+Saga could be classified as `Base` transaction (at least from my understanding)
+as it does not lock resources a.k.a locks and letting data of resources being available
+for other transactions to work with.
+
+As you could see the transaction handling introduced by Saga requires the application to
+define compensation actions or define actions as idempotent (you can repeat operation on the
+resource multiple times and you will get the same result - operation being repeated not leading to a different outcome).
+
+Still you can handle all the data integrity yourself in your application and design your system architecture
+to handle with failures. It's up to you if concept of Saga is useful for you or not.
+
+* https://www.cs.cornell.edu/andru/cs711/2002fa/reading/sagas.pdf (Sagas, Priceton University, 1987)
+* http://queue.acm.org/detail.cfm?id=1394128 (Base: An Acid Alternative, base transactions)
+* https://www.atomikos.com/Blog/ACAPSolutionProvingBrewerWrong (A CAP Solution (Proving Brewer Wrong) aka CQRS)
+--
+
+== Narayana and Sagas
+
+* XTS: WS-BA (Web Services Business Activity)
+* Compensating transactions (CDI annotations)
+* LRA (Long Running Actions, over REST)
+
+[NOTE.speaker]
+--
+* https://developer.jboss.org/wiki/CompensatingTransactionsWhenACIDIsTooMuch (Narayana: Compensating Transactions: When ACID is too much)
+--
+
+== Narayana LRA
+
+* LRA: Long Running Actions
+* Saga implementation for REST calls
+* based on the Eclipse MicroProfile stack (JAX-RS, CDI)
+
+== !
+
+image:{images}/saga/microprofile.jpg[role="noborder", 50%]
+
+* Java EE stack for microservices
+* https://github.com/jbosstm/microprofile-sandbox/blob/0009-LRA/proposals/0009-LRA/0009-LRA.md[LRA specification proposal, https://github.com/jbosstm/microprofile-sandbox]
+* https://groups.google.com/forum/#!msg/microprofile/CJirjFkM9Do/TrApz-fBDQAJ[Microprofile Google group, http://bit.ly/transactions-microprofile]
+
+[transition=slide, %notitle]
+== Demo
+
+image:{images}/saga/msa_calls.png[role="noborder"]
+
+[NOTE.speaker]
+--
+* https://github.com/redhat-helloworld-msa/helloworld-msa
+* https://developer.jboss.org/wiki/MSAQuickstartsWithLRAREST-ATOnMinishift
+
+To get logs for the particular services:
+
+* `oc logs -f `oc get pods | grep ^ola | grep Running | awk '{ print $1 }'``
+* `oc logs -f `oc get pods | grep ^hola | grep Running | awk '{ print $1 }'``
+* `oc logs -f `oc get pods | grep ^aloha | grep Running | awk '{ print $1 }'``
+* `oc logs -f `oc get pods | grep ^bonjour | grep Running | awk '{ print $1 }'``
+--
+
+== Summary
+
+* Narayana LRA - implementation of Saga for REST calls
+* a better fit for MSA than ACID transactions
+* a tool that can help in desiging the application
+** MSA principles should be preserved
+
+== Sources
+
+* https://github.com/eclipse/microprofile-sandbox/tree/master/proposals/0009-LRA
+* https://github.com/jbosstm/narayana/tree/master/rts/lra
+* https://github.com/ochaloup/helloworld-msa/tree/lra
+
+== !
+
+image:{images}/entertain/cajk.jpg[role="noborder", , height="270"]

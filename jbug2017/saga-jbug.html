@@ -1,0 +1,134 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><title>Saga over REST for microservices</title><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui" name="viewport"><link href="reveal.js/css/reveal.css" rel="stylesheet"><link rel="stylesheet" href="reveal.js/css/theme/redhat.css" id="theme"><link href="reveal.js/lib/css/zenburn.css" rel="stylesheet"><script>document.write( '<link rel="stylesheet" href="reveal.js/css/print/' + ( window.location.search.match( /print-pdf/gi ) ? 'pdf' : 'paper' ) + '.css" type="text/css" media="print">' );</script></head><body><div class="reveal"><div class="slides"><section class="title" data-state="title"><h1>Saga over REST for microservices</h1><div class="preamble"><div class="paragraph"><p>Ondra Chaloupka / <a href="mailto:ochaloup@redhat.com">ochaloup@redhat.com</a></p></div></div></section>
+<section><div class="paragraph"><p><span class="image noborder"><img src="./misc/saga/wfly_narayana.png" alt="wfly narayana"></span></p></div>
+<aside class="notes"><div class="ulist"><ul><li><p>Red Hat (<a href="https://developers.redhat.com" class="bare">https://developers.redhat.com</a>)</p></li><li><p>Wild Fly (<a href="http://wildfly.io" class="bare">http://wildfly.io</a>)</p></li><li><p>Naryana (<a href="http://narayana.io" class="bare">http://narayana.io</a>)</p></li></ul></div></aside></section>
+<section><div class="paragraph"><p><span class="image noborder"><img src="./misc/saga/narayana_logo.png" alt="narayana logo"></span></p></div>
+<div class="ulist"><ul><li><p>earlier <strong>Arjuna</strong>, renamed to <strong>Narayana</strong></p></li><li><p><strong>JTA</strong> implementation in JBoss/WildFly</p></li><li><p><strong>JTS</strong> distributed transaction over IIOP</p></li><li><p>webservice transactions (<strong>WS-AT/WS-BA</strong>)</p></li><li><p><strong>STM</strong> for <a href="http://vertx.io">Vert.x</a></p></li><li><p><strong>saga</strong> transactions over REST</p></li></ul></div></section>
+<section id="_agenda"><h2>Agenda</h2><div class="ulist"><ul><li><p>What is meant under term <em>microservice</em> in scope of this presentation</p></li><li><p>How the the distributed transactions and 2PC works</p></li><li><p>What is saga and why could be good fit for microservice architecture</p></li><li><p>What are and how to use Narayana Long Running Actions</p></li></ul></div></section>
+<section data-background-image="./misc/saga/kleppmann-txn-msa-quotation.png" data-background-size="cover"></section>
+<section id="_microservice_architecture"><h2>Microservice architecture</h2><div class="paragraph"><p><span class="image noborder stretch"><img src="./misc/saga/posta-msa.png" alt="posta msa"></span></p></div>
+<div class="paragraph"><p>(<em>credit: Christian Posta, <a href="http://blog.christianposta.com" class="bare">http://blog.christianposta.com</a></em>)</p></div>
+<aside class="notes"><div class="ulist"><ul><li><p>Martin Fowler: <a href="https://martinfowler.com/articles/microservices.html" class="bare">https://martinfowler.com/articles/microservices.html</a></p></li><li><p>Burr Sutter: <a href="https://www.youtube.com/watch?v=35_yWad7IiQ" class="bare">https://www.youtube.com/watch?v=35_yWad7IiQ</a></p></li><li><p>Christian Posta: <a href="http://blog.christianposta.com/microservices/the-hardest-part-about-microservices-data" class="bare">http://blog.christianposta.com/microservices/the-hardest-part-about-microservices-data</a></p></li></ul></div></aside></section>
+<section id="_distributed_transactions"><h2>Distributed transactions</h2><div class="paragraph stretch"><p><span class="image noborder stretch"><img src="./misc/saga/posta-msa-with-wfly.png" alt="posta msa with wfly"></span></p></div></section>
+<section id="_an_acid_transaction"><h2>An ACID transaction</h2><div class="ulist"><ul><li><p>An atomic unit of the work where everything or nothing is finished</p><div class="ulist"><ul><li><p>usually in regards of data manipulation</p></li></ul></div></li><li><p>Protecting shared resources from multiple users</p></li><li><p>A notion of a global consensus</p></li><li><p>ACID properties guaranteed</p></li></ul></div></section>
+<section><div class="paragraph"><p><span class="image noborder"><img src="./misc/saga/test-tubes.png" alt="test tubes"></span></p></div>
+<div class="ulist"><ul><li><p><span class="red">A</span>&#144;tomicity</p></li><li><p><span class="orange">C</span>&#144;onsistency</p></li><li><p><span class="green">I</span>&#144;solation</p></li><li><p><span class="blue">D</span>&#144;urability</p></li></ul></div>
+<aside class="notes"><div class="dlist"><dl><dt class="hdlist1"><strong>Atomicity</strong></dt><dd><p>"all or nothing", all operations in a transaction succeed or every operation is rolled back</p></dd><dt class="hdlist1"><strong>Consistency</strong></dt><dd><p>on the completion of a transaction, the database is structurally sound
+that covers e.g. preserve foreign keys, uniqueness defined by schema etc.</p></dd><dt class="hdlist1"><strong>Isolation</strong></dt><dd><p>transactions do not contend with one another. Contentious access to data is moderated by the database
+so that transactions appear to run sequentially.</p></dd><dt class="hdlist1"><strong>Durability</strong></dt><dd><p>the results of applying a transaction are permanent, even in the presence of failures</p><div class="ulist"><ul><li><p>Martin Kleppmann: <a href="https://www.youtube.com/watch?v=5ZjhNTM8XU8" class="bare">https://www.youtube.com/watch?v=5ZjhNTM8XU8</a></p></li></ul></div></dd></dl></div></aside></section>
+<section id="_distributed_vs_xa_transaction"><h2>Distributed vs. XA transaction</h2><div class="ulist"><ul><li><p>distributed transaction runs over multiple services</p></li><li><p>XA transaction joins operations over multiple resources</p></li></ul></div></section>
+<section id="_xa_handling"><h2>XA handling</h2><div class="paragraph"><p><span class="image noborder"><img src="./misc/saga/xa_handling.png" alt="xa handling"></span></p></div></section>
+<section id="_xa_transaction_2pc"><h2>XA transaction: 2PC</h2><div class="paragraph"><p><span class="image noborder"><img src="./misc/saga/2pc.png" alt="2pc"></span></p></div></section>
+<section id="_demo"><h2>Demo</h2><div class="paragraph"><p><span class="image noborder"><img src="./misc/saga/posta-msa-with-wfly-xa.png" alt="posta msa with wfly xa"></span></p></div>
+<aside class="notes"><div class="ulist"><ul><li><p>XA transaction coordinates non-homogenous participants</p></li><li><p>scaling troubles in distributed environment</p></li><li><p><a href="https://developer.jboss.org/wiki/TwoPhaseCommit2PC" class="bare">https://developer.jboss.org/wiki/TwoPhaseCommit2PC</a></p></li></ul></div></aside></section>
+<section id="_acid_distributed_transactions_assuming"><h2>ACID distributed transactions: assuming</h2><div class="ulist"><ul><li><p>closely coupled environment</p><div class="ulist"><ul><li><p>harder to scale</p></li><li><p>tight data coupling</p></li></ul></div></li><li><p>short duration</p><div class="ulist"><ul><li><p>locking reduces parallelism</p></li></ul></div></li></ul></div></section>
+<section id="_microservice_architecture_expecting"><h2>Microservice architecture: expecting</h2><div class="ulist"><ul><li><p>loosely coupling</p></li><li><p>scaling</p></li><li><p>long duration activities</p></li></ul></div></section>
+<section id="_sagas"><h2>Sagas</h2><div class="ulist"><ul><li><p>Transactional model for long living transaction</p></li><li><p>Saga paper (H. Garcia-Molina, K. Salem;  1987)</p></li><li><p>Relaxing ACID properties</p></li><li><p>Eventual consistent</p></li><li><p>Web services: WS-BA specification, SOA design pattern</p></li><li><p>REST and event sourcing: microservices</p></li></ul></div>
+<aside class="notes"><div class="paragraph"><p>Original paper talks about Saga as a solution for long-lived database transactions.
+We can use it for distributed environment too for not using two phase commit (a.k.a. locks).</p></div>
+<div class="paragraph"><p>Other names:</p></div>
+<div class="ulist"><ul><li><p>Sagas</p></li><li><p>Saga transactions</p></li><li><p>Saga actions</p></li><li><p>Business Activities (BA)</p></li><li><p>Long running actions (LRA)</p></li><li><p>Long Living transactions (LLT)</p></li><li><p><a href="https://www.cs.cornell.edu/andru/cs711/2002fa/reading/sagas.pdf" class="bare">https://www.cs.cornell.edu/andru/cs711/2002fa/reading/sagas.pdf</a> (Princeton University, 1987)</p></li><li><p><a href="http://jbossts.blogspot.cz/2017/06/sagas-and-how-they-differ-from-two.html" class="bare">http://jbossts.blogspot.cz/2017/06/sagas-and-how-they-differ-from-two.html</a></p></li><li><p><a href="http://microservices.io/patterns/data/saga.html" class="bare">http://microservices.io/patterns/data/saga.html</a></p></li><li><p><a href="https://www.youtube.com/watch?v=0UTOLRTwOX0" class="bare">https://www.youtube.com/watch?v=0UTOLRTwOX0</a> (JOTB17, Distributed Sagas: A Protocol for Coordinating Microservices, Caitie McCaffrey)</p></li><li><p><a href="http://docs.oasis-open.org/ws-tx/wstx-wsba-1.1-spec-os/wstx-wsba-1.1-spec-os.html" class="bare">http://docs.oasis-open.org/ws-tx/wstx-wsba-1.1-spec-os/wstx-wsba-1.1-spec-os.html</a> (Web Services Business Activity, 2007)</p></li></ul></div></aside></section>
+<section id="_sagas_2"><h2>Sagas (#2)</h2><div class="paragraph"><p><span class="image noborder"><img src="./misc/saga/saga_confirm.png" alt="saga confirm"></span></p></div>
+<div class="ulist"><ul><li><p>consists of a sequence of autonomous operations, each immediatelly visible to outer world</p></li><li><p>responsibility of failures handling to developer (handlers)</p></li><li><p>transaction manager is responsible for calling handlers</p></li></ul></div></section>
+<section id="_sagas_3"><h2>Sagas (#3)</h2><div class="paragraph"><p><span class="image noborder"><img src="./misc/saga/saga_compensate.png" alt="saga compensate"></span></p></div>
+<div class="ulist"><ul><li><p>compensation handler defined by developer, called by transaction manager</p></li></ul></div></section>
+<section id="_saga_transaction"><h2>Saga transaction</h2><div class="paragraph"><p><span class="image noborder"><img src="./misc/saga/saga.png" alt="saga"></span></p></div>
+<aside class="notes"><div class="paragraph"><p>The concept of the original paper talks about single node database but it could
+be applied to distributed transactions (as was already shown).</p></div>
+<div class="paragraph"><p>Saga could be classified as <code>Base</code> transaction (at least from my understanding)
+as it does not lock resources a.k.a locks and letting data of resources being available
+for other transactions to work with.</p></div>
+<div class="paragraph"><p>As you could see the transaction handling introduced by Saga requires the application to
+define compensation actions or define actions as idempotent (you can repeat operation on the
+resource multiple times and you will get the same result - operation being repeated not leading to a different outcome).</p></div>
+<div class="paragraph"><p>Still you can handle all the data integrity yourself in your application and design your system architecture
+to handle with failures. It&#8217;s up to you if concept of Saga is useful for you or not.</p></div>
+<div class="ulist"><ul><li><p><a href="https://www.cs.cornell.edu/andru/cs711/2002fa/reading/sagas.pdf" class="bare">https://www.cs.cornell.edu/andru/cs711/2002fa/reading/sagas.pdf</a> (Sagas, Priceton University, 1987)</p></li><li><p><a href="http://queue.acm.org/detail.cfm?id=1394128" class="bare">http://queue.acm.org/detail.cfm?id=1394128</a> (Base: An Acid Alternative, base transactions)</p></li><li><p><a href="https://www.atomikos.com/Blog/ACAPSolutionProvingBrewerWrong" class="bare">https://www.atomikos.com/Blog/ACAPSolutionProvingBrewerWrong</a> (A CAP Solution (Proving Brewer Wrong) aka CQRS)</p></li></ul></div></aside></section>
+<section id="_narayana_and_sagas"><h2>Narayana and Sagas</h2><div class="ulist"><ul><li><p>XTS: WS-BA (Web Services Business Activity)</p></li><li><p>Compensating transactions (CDI annotations)</p></li><li><p>LRA (Long Running Actions, over REST)</p></li></ul></div>
+<aside class="notes"><div class="ulist"><ul><li><p><a href="https://developer.jboss.org/wiki/CompensatingTransactionsWhenACIDIsTooMuch" class="bare">https://developer.jboss.org/wiki/CompensatingTransactionsWhenACIDIsTooMuch</a> (Narayana: Compensating Transactions: When ACID is too much)</p></li></ul></div></aside></section>
+<section id="_narayana_lra"><h2>Narayana LRA</h2><div class="ulist"><ul><li><p>LRA: Long Running Actions</p></li><li><p>Saga implementation for REST calls</p></li><li><p>based on the Eclipse MicroProfile stack (JAX-RS, CDI)</p></li></ul></div></section>
+<section><div class="paragraph"><p><span class="image noborder"><img src="./misc/saga/microprofile.jpg" alt="microprofile" width="50%"></span></p></div>
+<div class="ulist"><ul><li><p>Java EE stack for microservices</p></li><li><p><a href="https://github.com/jbosstm/microprofile-sandbox/blob/0009-LRA/proposals/0009-LRA/0009-LRA.md">LRA specification proposal, https://github.com/jbosstm/microprofile-sandbox</a></p></li><li><p><a href="https://groups.google.com/forum/#!msg/microprofile/CJirjFkM9Do/TrApz-fBDQAJ">Microprofile Google group, http://bit.ly/transactions-microprofile</a></p></li></ul></div></section>
+<section id="_demo_2" data-transition="slide"><h2>Demo</h2><div class="paragraph"><p><span class="image noborder"><img src="./misc/saga/msa_calls.png" alt="msa calls"></span></p></div>
+<aside class="notes"><div class="ulist"><ul><li><p><a href="https://github.com/redhat-helloworld-msa/helloworld-msa" class="bare">https://github.com/redhat-helloworld-msa/helloworld-msa</a></p></li><li><p><a href="https://developer.jboss.org/wiki/MSAQuickstartsWithLRAREST-ATOnMinishift" class="bare">https://developer.jboss.org/wiki/MSAQuickstartsWithLRAREST-ATOnMinishift</a></p></li></ul></div>
+<div class="paragraph"><p>To get logs for the particular services:</p></div>
+<div class="ulist"><ul><li><p><code>oc logs -f `oc get pods | grep ^ola | grep Running | awk '{ print $1 }'`</code></p></li><li><p><code>oc logs -f `oc get pods | grep ^hola | grep Running | awk '{ print $1 }'`</code></p></li><li><p><code>oc logs -f `oc get pods | grep ^aloha | grep Running | awk '{ print $1 }'`</code></p></li><li><p><code>oc logs -f `oc get pods | grep ^bonjour | grep Running | awk '{ print $1 }'`</code></p></li></ul></div></aside></section>
+<section id="_summary"><h2>Summary</h2><div class="ulist"><ul><li><p>Narayana LRA - implementation of Saga for REST calls</p></li><li><p>a better fit for MSA than ACID transactions</p></li><li><p>a tool that can help in desiging the application</p><div class="ulist"><ul><li><p>MSA principles should be preserved</p></li></ul></div></li></ul></div></section>
+<section id="_sources"><h2>Sources</h2><div class="ulist"><ul><li><p><a href="https://github.com/eclipse/microprofile-sandbox/tree/master/proposals/0009-LRA" class="bare">https://github.com/eclipse/microprofile-sandbox/tree/master/proposals/0009-LRA</a></p></li><li><p><a href="https://github.com/jbosstm/narayana/tree/master/rts/lra" class="bare">https://github.com/jbosstm/narayana/tree/master/rts/lra</a></p></li><li><p><a href="https://github.com/ochaloup/helloworld-msa/tree/lra" class="bare">https://github.com/ochaloup/helloworld-msa/tree/lra</a></p></li></ul></div></section>
+<section><div class="paragraph"><p><span class="image noborder"><img src="./misc/entertain/cajk.jpg" alt="cajk" height="270"></span></p></div></section></div></div><script src="reveal.js/lib/js/head.min.js"></script><script src="reveal.js/js/reveal.js"></script><script>// See https://github.com/hakimel/reveal.js#configuration for a full list of configuration options
+Reveal.initialize({
+  // Display controls in the bottom right corner
+  controls: false,
+  // Display a presentation progress bar
+  progress: true,
+  // Display the page number of the current slide
+  slideNumber: false,
+  // Push each slide change to the browser history
+  history: false,
+  // Enable keyboard shortcuts for navigation
+  keyboard: true,
+  // Enable the slide overview mode
+  overview: true,
+  // Vertical centering of slides
+  center: true,
+  // Enables touch navigation on devices with touch input
+  touch: true,
+  // Loop the presentation
+  loop: false,
+  // Change the presentation direction to be RTL
+  rtl: false,
+  // Turns fragments on and off globally
+  fragments: true,
+  // Flags if the presentation is running in an embedded mode,
+  // i.e. contained within a limited portion of the screen
+  embedded: false,
+  // Number of milliseconds between automatically proceeding to the
+  // next slide, disabled when set to 0, this value can be overwritten
+  // by using a data-autoslide attribute on your slides
+  autoSlide: 0,
+  // Stop auto-sliding after user input
+  autoSlideStoppable: true,
+  // Enable slide navigation via mouse wheel
+  mouseWheel: false,
+  // Hides the address bar on mobile devices
+  hideAddressBar: true,
+  // Opens links in an iframe preview overlay
+  previewLinks: false,
+  // Theme (e.g., beige, black, league, night, serif, simple, sky, solarized, white)
+  // NOTE setting the theme in the config no longer works in reveal.js 3.x
+  //theme: Reveal.getQueryHash().theme || 'redhat',
+  // Transition style (e.g., none, fade, slide, convex, concave, zoom)
+  transition: Reveal.getQueryHash().transition || 'fade',
+  // Transition speed (e.g., default, fast, slow)
+  transitionSpeed: 'default',
+  // Transition style for full page slide backgrounds (e.g., none, fade, slide, convex, concave, zoom)
+  backgroundTransition: 'fade',
+  // Number of slides away from the current that are visible
+  viewDistance: 3,
+  // Parallax background image (e.g., "'https://s3.amazonaws.com/hakim-static/reveal-js/reveal-parallax-1.jpg'")
+  parallaxBackgroundImage: '',
+  // Parallax background size in CSS syntax (e.g., "2100px 900px")
+  parallaxBackgroundSize: '',
+
+  // The "normal" size of the presentation, aspect ratio will be preserved
+  // when the presentation is scaled to fit different resolutions. Can be
+  // specified using percentage units.
+  width: 960,
+  height: 700,
+
+  // Factor of the display size that should remain empty around the content
+  margin: 0.1,
+
+  // Bounds for smallest/largest possible scale to apply to content
+  minScale: 0.2,
+  maxScale: 1.5,
+
+  // Optional libraries used to extend on reveal.js
+  dependencies: [
+      { src: 'reveal.js/lib/js/classList.js', condition: function() { return !document.body.classList; } },
+      { src: 'reveal.js/plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+      { src: 'reveal.js/plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+      { src: 'reveal.js/plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+      { src: 'reveal.js/plugin/zoom-js/zoom.js', async: true, condition: function() { return !!document.body.classList; } },
+      { src: 'reveal.js/plugin/notes/notes.js', async: true, condition: function() { return !!document.body.classList; } }
+  ]
+});</script></body></html>

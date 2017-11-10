@@ -1,0 +1,10 @@
+
+ALTER SYSTEM SET max_prepared_transactions = 50;
+
+CREATE TABLE SIMPLE_ENTITY (
+    id VARCHAR(255) PRIMARY KEY,
+    value INTEGER
+);
+
+INSERT INTO SIMPLE_ENTITY (id,value) VALUES ('1', 1);
+
