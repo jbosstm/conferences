@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	JBoss, Home of Professional Open Source Copyright 2010, Red Hat
+	Middleware LLC, and others contributors as indicated by the @authors
+	tag. All rights reserved. See the copyright.txt in the distribution
+	for a full listing of individual contributors. This copyrighted
+	material is made available to anyone wishing to use, modify, copy, or
+	redistribute it subject to the terms and conditions of the GNU Lesser
+	General Public License, v. 2.1. This program is distributed in the
+	hope that it will be useful, but WITHOUT A WARRANTY; without even the
+	implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+	PURPOSE. See the GNU Lesser General Public License for more details.
+	You should have received a copy of the GNU Lesser General Public
+	License, v.2.1 along with this distribution; if not, write to the Free
+	Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+	02110-1301, USA.
+-->
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.jboss.narayana.javaone</groupId>
+    <artifactId>lrademo</artifactId>
+    <version>1.0.0.Final</version>
+    <name>JavaOne LRA demo</name>
+    <description>Provides examples of how to use LRA</description>
+    <packaging>pom</packaging>
+    <repositories>
+        <repository>
+            <id>jboss-public-repository-group</id>
+            <name>JBoss Public Maven Repository Group</name>
+            <url>https://repository.jboss.org/nexus/content/groups/public/</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
+    <modules>
+        <module>trip-utils</module>
+        <module>flight-service</module>
+        <module>hotel-service</module>
+        <module>trip-controller</module>
+    </modules>
+    <properties>
+        <version.io.narayana>5.7.0.Final</version.io.narayana>
+    </properties>
+</project>

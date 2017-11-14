@@ -1,0 +1,18 @@
+trip:Microservice
+root:RootLRA[/a]
+/subordinate:NestedLRA[a/]
+flight:Microservice
+flightParticipant:Participant
+flightData:DataStore
+
+
+[c:for name: "firstClass", "economy"]
+trip:flight.reserve(name)
+flight:subordinate.new()
+subordinate:root.PUT(this)
+flight:flightParticipant.getReference
+flight:subordinate.PUT(flightParticipant)
+flight:flightData.add(name, "PROVISIONAL")
+flight:subordinate.
+subordinate:flightData.update(name, "CONFIRMED")
+[/c]

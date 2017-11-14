@@ -1,0 +1,15 @@
+trip:Microservice
+/root:RootLRA[/a]
+filter:Narayana[/a]
+hotel:Microservice
+hotelParticipant:Participant
+hotelData:DataStore
+
+trip:root.new(POST)
+
+trip:filter.reserve("The Grand")
+filter:hotelParticipant.getReference
+filter:root.PUT(hotelParticipant)
+filter:hotel.reserve("TheGrand")
+hotel:hotelData.add("TheGrand", "PROVISIONAL")
+

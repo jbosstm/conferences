@@ -1,0 +1,15 @@
+client:Client[/a]
+/lra:LRA
+ms1:Microservice[/a]
+/p1:Participant
+dataStore:DataStore[/a]
+
+client:lra.new
+client:ms1.businessLogic(lra)
+ms1:p1.new
+ms1:lra.enlistParticipant(p1)
+ms1:dataStore.performBusinessUpdate
+
+client:lra.complete
+lra:p1.complete
+p1:dataStore.transitionBusinessUpdate

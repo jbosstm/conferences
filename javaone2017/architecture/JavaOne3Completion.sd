@@ -1,0 +1,16 @@
+trip:Trip[/a]
+root:RootLRA[/a]
+hotelParticipant:Participant[/a]
+hotelData:HotelData[/a]
+subordinate:NestedLRA[a/]
+flightParticipant:Participant[/a]
+
+trip:root./close
+root:hotelParticipant./complete
+hotelParticipant:hotelData.update("TheGrand", "CONFIRMED")
+root:subordinate./complete
+*5 subordinate
+Won't update flight 
+participant as already 
+know participant outcome
+*5
