@@ -5,9 +5,9 @@ Conference presentation materials (slides, demonstration code, etc)
 Add a new directory for each conference, JBUG etc that you present at.
 Update this README.md file with a note about the event (and if you did any blogs etc prior to or after the event then those could be added here too).
 
-## DevoxxUK - May 2017: Transactional Actors with Eclipse Vert.x
+## Devoxx UK - May 2017: Transactional Actors with Eclipse Vert.x
 
-Event: [Devoxx](https://www.devoxx.co.uk)
+Event: [Devoxx UK](https://www.devoxx.co.uk)
 
 Materials:
 
