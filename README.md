@@ -7,9 +7,11 @@ Update this README.md file with a note about the event (and if you did any blogs
 
 ## DevoxxUK - May 2017: Transactional Actors with Eclipse Vert.x
 
-Event: [Devoxx](https://www.youtube.com/watch?v=Ikwj7gxemLQ)
+Event: [Devoxx](https://www.devoxx.co.uk)
 
 Materials:
+
+Video: [recording of session](https://www.youtube.com/watch?v=Ikwj7gxemLQ)
 
 ## JavaOne - October 2017: Transactions for Microservices? Really?
 
