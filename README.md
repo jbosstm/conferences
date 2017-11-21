@@ -11,7 +11,7 @@ Event: [JavaOne](https://www.oracle.com/javaone/index.html)
 
 Materials: [demonstration code](javaone2017)
 
-## µCon London 2017
+## µCon November London 2017
 
 Event: [µCon London 2017: The Microservices Conference](https://skillsmatter.com/conferences/8549-con-2017-the-microservices-conference)
 
