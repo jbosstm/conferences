@@ -5,6 +5,12 @@ Conference presentation materials (slides, demonstration code, etc)
 Add a new directory for each conference, JBUG etc that you present at.
 Update this README.md file with a note about the event (and if you did any blogs etc prior to or after the event then those could be added here too).
 
+## DevoxxUK - May 2017: Transactional Actors with Eclipse Vert.x
+
+Event: [Devoxx](https://www.youtube.com/watch?v=Ikwj7gxemLQ)
+
+Materials:
+
 ## JavaOne - October 2017: Transactions for Microservices? Really?
 
 Event: [JavaOne](https://www.oracle.com/javaone/index.html)
