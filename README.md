@@ -29,7 +29,7 @@ Blog: [narayana team blog post](http://jbossts.blogspot.co.uk/2017/11/software-t
 
 ## Brno JBUG - November 2017: Saga over REST for microservices
 
-Event: [JBoss User Group Brno](https://developer.jboss.org/groups/jbugcz?view=documents)
+Event: [JBoss User Group Brno](https://developer.jboss.org/wiki/JBugcz-1711TransactionsForMicroservicesInNarayana)
 
 Materials: [presentation and demo](jbug2017)
 
