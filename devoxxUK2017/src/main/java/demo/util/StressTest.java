@@ -19,16 +19,17 @@ public class StressTest extends AbstractVerticle {
 
     private static CountDownLatch targetCnt;
 
+    // java -jar target/stress-1.0.jar requests=10 url=api
     public static void main(String[] args) throws InterruptedException, ExecutionException {
         opts = new ProgArgs(args);
         int parallelism = opts.getIntOption("parallelism", 20);
-        int requests = opts.getIntOption("requests", 20);
+        int requests = opts.getIntOption("requests", 10);
         int target = parallelism * requests;
 
         targetCnt = new CountDownLatch(target);
 
         if (opts.getStringOption("help", null) != null) {
-            System.out.printf("syntax: StressTest [parallelism=20] [requests=100] [port=8080] [url=/api/trip/Odeon/ABC]");
+            System.out.printf("syntax: Stress [parallelism=20] [requests=10] [port=8080] [url=/api/trip/Odeon/ABC]");
             return;
         }
 
@@ -44,7 +45,7 @@ public class StressTest extends AbstractVerticle {
         targetCnt.await();
 
         long duration = (System.nanoTime() - startTime);
-        System.out.printf("%d out of %d requests failed in %d ms%n", failCnt.get(), target, duration / 100000);
+        System.out.printf("%d out of %d requests failed in %d ms%n", failCnt.get(), target, duration / 1000000);
 
         vertx.close();
     }
@@ -52,7 +53,7 @@ public class StressTest extends AbstractVerticle {
     @Override
     public void start() throws Exception {
         HttpClient client = vertx.createHttpClient();
-        String url = opts.getStringOption("url", "/api/trip/Odeon/ABC");
+        String url = opts.getStringOption("url", "/api");
         int requests = opts.getIntOption("requests", 20);
         int port = opts.getIntOption("port",8080);
         boolean verbose = opts.getBooleanOption("verbose", false);
@@ -62,12 +63,18 @@ public class StressTest extends AbstractVerticle {
     }
 
     private void invokeService(HttpClient client, int port, String host, String url, boolean verbose) {
+System.out.printf("POSTing to %d %s %s%n", port, host, url);
         client.post(port, host, url)
                 .exceptionHandler(e -> {
-                    incrFailCount(); System.out.printf("Theatre booking request failed: %s%n", e.getLocalizedMessage());
+                    incrFailCount(); System.out.printf("request failed: %s%n", e.getLocalizedMessage());
                 })
                 .handler(h -> {
-                    incrPassCount(); if (verbose) System.out.printf("%s%n", h.toString());
+                    if (h.statusCode() >= 200 && h.statusCode() <= 204)
+                        incrPassCount();
+                    else
+                        incrFailCount();
+
+                    if (verbose) System.out.printf("%d and %d of %d %s%n", passCnt, failCnt, targetCnt.getCount(), h.toString());
                 })
                 .end();
     }
