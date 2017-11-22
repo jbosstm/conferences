@@ -9,7 +9,7 @@ Update this README.md file with a note about the event (and if you did any blogs
 
 Event: [Devoxx UK](https://www.devoxx.co.uk)
 
-Materials:
+Materials: [slide deck](devoxxUK2017/DevoxxUK2017TransactionalActors.pdf) and [demonstration code](devoxxUK2017)
 
 Video: [recording of session](https://www.youtube.com/watch?v=Ikwj7gxemLQ)
 
