@@ -66,15 +66,62 @@ depending upon which narayana release you have.
 
 Create 2 bookings:
 
+First booking execute:
+
   curl -X POST http://localhost:8080/api/theatre/Apollo
+
+Expected output should look similar to:
+
+{
+  "serviceName" : "theatre",
+  "threadId" : "vert.x-eventloop-thread-3",
+  "message" : "",
+  "bookingCount" : 1,
+  "altBookingCount" : 0
+}
+
+Second booking execute:
+
   curl -X POST http://localhost:8080/api/theatre/Savoy
 
-observe how each request is serviced on a different verticle instance
+Expected output should look similar to:
+
+{
+  "serviceName" : "theatre",
+  "threadId" : "vert.x-eventloop-thread-2",
+  "message" : "",
+  "bookingCount" : 2,
+  "altBookingCount" : 0
+}
+
+Observe how each request is serviced on a different verticle instance
 
 Similarly performing GETs will show the same booking counts regardless of which verticle services it:
 
   curl -X GET http://localhost:8080/api/theatre 
   curl -X GET http://localhost:8080/api/theatre 
+
+Where you should see something similar to the following two outcomes:
+
+{
+  "serviceName" : "theatre",
+  "threadId" : "vert.x-eventloop-thread-9",
+  "message" : "",
+  "bookingCount" : 2,
+  "altBookingCount" : 0
+}
+
+and
+
+{
+  "serviceName" : "theatre",
+  "threadId" : "vert.x-eventloop-thread-8",
+  "message" : "",
+  "bookingCount" : 2,
+  "altBookingCount" : 0
+}
+
+At this point we are finished with the first use case and you can kill the running process.
 
 Use Case 2: Scaling by distributing the workload across JVMs
 ==========================================
@@ -118,12 +165,57 @@ Create two bookings using services running in the two different JVMs (on endpoin
 respectively):
 
   curl -X POST http://localhost:8080/api/theatre/Apollo
+
+which should give ouput like:
+
+{
+  "serviceName" : "theatre",
+  "threadId" : "vert.x-eventloop-thread-0",
+  "message" : "",
+  "bookingCount" : 1,
+  "altBookingCount" : 0
+}
+
+and then:
+
   curl -X POST http://localhost:8082/api/theatre/Savoy
+
+which should give output similar to:
+
+{
+  "serviceName" : "theatre",
+  "threadId" : "vert.x-eventloop-thread-5",
+  "message" : "",
+  "bookingCount" : 2,
+  "altBookingCount" : 0
+}
 
 Check that each JVM reports the correct number of bookings (namely 2):
 
   curl -X GET http://localhost:8080/api/theatre
   curl -X GET http://localhost:8082/api/theatre
+
+And you should see the following outputs:
+
+{
+  "serviceName" : "theatre",
+  "threadId" : "vert.x-eventloop-thread-1",
+  "message" : "",
+  "bookingCount" : 2,
+  "altBookingCount" : 0
+}
+
+and
+
+{
+  "serviceName" : "theatre",
+  "threadId" : "vert.x-eventloop-thread-8",
+  "message" : "",
+  "bookingCount" : 2,
+  "altBookingCount" : 0
+}
+
+At this stage you can kill both running processes before moving on to the next Use Case.
 
 Use Case 3: Managing shared state across different STM objects
 ===============================================
@@ -147,18 +239,77 @@ or
 
 Make two trip bookings:
 
+First execute:
+
   curl -X POST http://localhost:8080/api/trip/Savoy/ABC
+
+to obtain:
+
+{
+  "serviceName" : "trip",
+  "threadId" : "vert.x-eventloop-thread-8",
+  "message" : "1 bookings with alt taxi service",
+  "bookingCount" : 1,
+  "altBookingCount" : 1
+}
+
+Then execute:
+
   curl -X POST http://localhost:8080/api/trip/Apollo/XYZ
+
+to get:
+
+{
+  "serviceName" : "trip",
+  "threadId" : "vert.x-eventloop-thread-0",
+  "message" : "2 bookings with alt taxi service",
+  "bookingCount" : 2,
+  "altBookingCount" : 2
+}
 
 and a single theatre booking:
 
   curl -X POST http://localhost:8080/api/theatre/Savoy
+
+giving the following output:
+
+{
+  "serviceName" : "theatre",
+  "threadId" : "vert.x-eventloop-thread-9",
+  "message" : "",
+  "bookingCount" : 3,
+  "altBookingCount" : 0
+}
 
 observe that each booking is serviced by a different verticle. Check that number of theatre (3) and
 number of taxi (2) bookings are correct:
 
   curl -X GET http://localhost:8080/api/theatre
   curl -X GET http://localhost:8080/api/taxi
+
+Which will give the following outputs:
+
+{
+  "serviceName" : "theatre",
+  "threadId" : "vert.x-eventloop-thread-5",
+  "message" : "",
+  "bookingCount" : 3,
+  "altBookingCount" : 0
+}
+
+and
+
+{
+  "serviceName" : "taxi",
+  "threadId" : "vert.x-eventloop-thread-2",
+  "message" : "",
+  "bookingCount" : 2,
+  "altBookingCount" : 0
+}
+
+respectively.
+
+Again, kill the demo process before proceeding to the next use case.
 
 Use Case 4: Stress Testing:
 --------------------------
@@ -177,3 +328,22 @@ Start the theatre service in one window or in the background:
 and now make lots of concurrent bookings:
 
   mvn exec:java -Pstress
+
+You should see output similar to the folllowing which indicates successful completion:
+
+[INFO] Scanning for projects...
+[INFO]                                                                         
+[INFO] ------------------------------------------------------------------------
+[INFO] Building Narayana - STM and vertx demo 5.7.2.Final-SNAPSHOT
+[INFO] ------------------------------------------------------------------------
+[INFO] 
+[INFO] --- exec-maven-plugin:1.4.0:java (default-cli) @ stm-vertx-demo ---
+Waiting for 1000 requests
+0 out of 1000 requests failed in 6227 ms
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time: 2.611s
+[INFO] Finished at: Wed Nov 22 19:22:44 GMT 2017
+[INFO] Final Memory: 16M/362M
+[INFO] ------------------------------------------------------------------------
