@@ -42,6 +42,7 @@ What it's good for:
 Features:
 
 This example shows a Theatre booking service:
+
    - an STM object is used to maintain all Theatre bookings
      * the STM object is volatile
    - multiple vertx instances each listening on the same HTTP endpoint
@@ -52,6 +53,8 @@ This example shows a Theatre booking service:
 
 Usage:
 ------
+
+Start a Vert.x verticle to represent the theatre service:
 
   mvn exec:java -Pdemo1
 
@@ -64,6 +67,29 @@ HTTP port 8080. The port and number of instances are configurable. If run the ex
 java command line notice that the version of the jar (5.6.0.Final-SNAPSHOT in this example) will change
 depending upon which narayana release you have.
 
+The kind of output that you should expect to see is as follows:
+
+  [mmusgrov@dev1 devoxxUK2017](mucon)$ mvn exec:java -Pdemo1
+  [INFO] Scanning for projects...
+  [INFO]                                                                         
+  [INFO] ------------------------------------------------------------------------
+  [INFO] Building Narayana - STM and vertx demo 5.7.2.Final-SNAPSHOT
+  [INFO] ------------------------------------------------------------------------
+  [INFO] 
+  [INFO] --- exec-maven-plugin:1.4.0:java (default-cli) @ stm-vertx-demo ---
+  Nov 22, 2017 6:16:53 PM com.arjuna.ats.arjuna.recovery.TransactionStatusManager start
+  INFO: ARJUNA012170: TransactionStatusManager started on port 37255 and host 127.0.0.1 with service com.arjuna.ats.arjuna.recovery.ActionStatusService
+  vert.x-eventloop-thread-3: theatre service listening on http://localhost:8080/api/theatre
+  vert.x-eventloop-thread-0: theatre service listening on http://localhost:8080/api/theatre
+  vert.x-eventloop-thread-5: theatre service listening on http://localhost:8080/api/theatre
+  vert.x-eventloop-thread-4: theatre service listening on http://localhost:8080/api/theatre
+  vert.x-eventloop-thread-8: theatre service listening on http://localhost:8080/api/theatre
+  vert.x-eventloop-thread-6: theatre service listening on http://localhost:8080/api/theatre
+  vert.x-eventloop-thread-2: theatre service listening on http://localhost:8080/api/theatre
+  vert.x-eventloop-thread-9: theatre service listening on http://localhost:8080/api/theatre
+  vert.x-eventloop-thread-7: theatre service listening on http://localhost:8080/api/theatre
+  vert.x-eventloop-thread-1: theatre service listening on http://localhost:8080/api/theatre
+
 Create 2 bookings:
 
 First booking execute:
@@ -72,13 +98,13 @@ First booking execute:
 
 Expected output should look similar to:
 
-{
-  "serviceName" : "theatre",
-  "threadId" : "vert.x-eventloop-thread-3",
-  "message" : "",
-  "bookingCount" : 1,
-  "altBookingCount" : 0
-}
+  {
+    "serviceName" : "theatre",
+    "threadId" : "vert.x-eventloop-thread-3",
+    "message" : "",
+    "bookingCount" : 1,
+    "altBookingCount" : 0
+  }
 
 Second booking execute:
 
@@ -86,13 +112,16 @@ Second booking execute:
 
 Expected output should look similar to:
 
-{
-  "serviceName" : "theatre",
-  "threadId" : "vert.x-eventloop-thread-2",
-  "message" : "",
-  "bookingCount" : 2,
-  "altBookingCount" : 0
-}
+  {
+    "serviceName" : "theatre",
+    "threadId" : "vert.x-eventloop-thread-2",
+    "message" : "",
+    "bookingCount" : 2,
+    "altBookingCount" : 0
+  }
+
+Here the theatre service is listening on the REST endpoint http://localhost:8080/api/theatre and the final path component (Apollo and Savoy in this example) is interpreted as an input parameter.
+Although this is not a RESTful design it suffices to show the intent of the demo which is to
 
 Observe how each request is serviced on a different verticle instance
 
@@ -103,23 +132,23 @@ Similarly performing GETs will show the same booking counts regardless of which 
 
 Where you should see something similar to the following two outcomes:
 
-{
-  "serviceName" : "theatre",
-  "threadId" : "vert.x-eventloop-thread-9",
-  "message" : "",
-  "bookingCount" : 2,
-  "altBookingCount" : 0
-}
+  {
+    "serviceName" : "theatre",
+    "threadId" : "vert.x-eventloop-thread-9",
+    "message" : "",
+    "bookingCount" : 2,
+    "altBookingCount" : 0
+  }
 
 and
 
-{
-  "serviceName" : "theatre",
-  "threadId" : "vert.x-eventloop-thread-8",
-  "message" : "",
-  "bookingCount" : 2,
-  "altBookingCount" : 0
-}
+  {
+    "serviceName" : "theatre",
+    "threadId" : "vert.x-eventloop-thread-8",
+    "message" : "",
+    "bookingCount" : 2,
+    "altBookingCount" : 0
+  }
 
 At this point we are finished with the first use case and you can kill the running process.
 
@@ -142,6 +171,8 @@ What it's good for:
 Usage:
 ------
 
+Start a Vert.x verticle to represent the theatre service:
+
   mvn exec:java -Pdemo2
 
 or
@@ -151,9 +182,9 @@ or
 Start a second verticle that will share the same STM object. In the output of the above command
 look for the line that reports the uid of the STM object, for example:
 
-> Theatre STM uid: 0:ffffac1182c6:9197:5912d4ff:1
+  Theatre STM uid: 0:ffffac1182c6:9197:5912d4ff:1
 
-The actual uid may change from run to run. Pass this uid the second JVM using a java system property:
+The actual uid may change from run to run. Pass this uid the second JVM using a java system property called uid:
 
   mvn exec:java -Pdemo2 -Duid=0:ffffac1182c6:9197:5912d4ff:1
 
@@ -166,15 +197,15 @@ respectively):
 
   curl -X POST http://localhost:8080/api/theatre/Apollo
 
-which should give ouput like:
+which should give output like:
 
-{
-  "serviceName" : "theatre",
-  "threadId" : "vert.x-eventloop-thread-0",
-  "message" : "",
-  "bookingCount" : 1,
-  "altBookingCount" : 0
-}
+  {
+    "serviceName" : "theatre",
+    "threadId" : "vert.x-eventloop-thread-0",
+    "message" : "",
+    "bookingCount" : 1,
+    "altBookingCount" : 0
+  }
 
 and then:
 
@@ -182,13 +213,13 @@ and then:
 
 which should give output similar to:
 
-{
-  "serviceName" : "theatre",
-  "threadId" : "vert.x-eventloop-thread-5",
-  "message" : "",
-  "bookingCount" : 2,
-  "altBookingCount" : 0
-}
+  {
+    "serviceName" : "theatre",
+    "threadId" : "vert.x-eventloop-thread-5",
+    "message" : "",
+    "bookingCount" : 2,
+    "altBookingCount" : 0
+  }
 
 Check that each JVM reports the correct number of bookings (namely 2):
 
@@ -197,23 +228,23 @@ Check that each JVM reports the correct number of bookings (namely 2):
 
 And you should see the following outputs:
 
-{
-  "serviceName" : "theatre",
-  "threadId" : "vert.x-eventloop-thread-1",
-  "message" : "",
-  "bookingCount" : 2,
-  "altBookingCount" : 0
-}
+  {
+    "serviceName" : "theatre",
+    "threadId" : "vert.x-eventloop-thread-1",
+    "message" : "",
+    "bookingCount" : 2,
+    "altBookingCount" : 0
+  }
 
 and
 
-{
-  "serviceName" : "theatre",
-  "threadId" : "vert.x-eventloop-thread-8",
-  "message" : "",
-  "bookingCount" : 2,
-  "altBookingCount" : 0
-}
+  {
+    "serviceName" : "theatre",
+    "threadId" : "vert.x-eventloop-thread-8",
+    "message" : "",
+    "bookingCount" : 2,
+    "altBookingCount" : 0
+  }
 
 At this stage you can kill both running processes before moving on to the next Use Case.
 
@@ -231,13 +262,15 @@ What it's good for:
 The trip service fulfils booking requests by updating shared STM objects representing the theatre and
 taxi booking services respectively.
 
+Start a Vert.x verticle to represent trip booking service:
+
   mvn exec:java -Pdemo3
 
 or
 
   java -cp target/stm-vertx-demo-5.6.0.Final-SNAPSHOT-fat.jar demo.demo3.TripSTMVerticle
 
-Make two trip bookings:
+Make two trip bookings (specifying the required hotel and taxi company for the trip):
 
 First execute:
 
@@ -245,43 +278,45 @@ First execute:
 
 to obtain:
 
-{
-  "serviceName" : "trip",
-  "threadId" : "vert.x-eventloop-thread-8",
-  "message" : "1 bookings with alt taxi service",
-  "bookingCount" : 1,
-  "altBookingCount" : 1
-}
+  {
+    "serviceName" : "trip",
+    "threadId" : "vert.x-eventloop-thread-8",
+    "message" : "1 bookings with alt taxi service",
+    "bookingCount" : 1,
+    "altBookingCount" : 1
+  }
 
 Then execute:
 
   curl -X POST http://localhost:8080/api/trip/Apollo/XYZ
 
-to get:
+Here the trip booking service is listening on the REST endpoint http://localhost:8080/api/trip and the final two path components (Savoy and ABC in the first example) are interpreted as an input parameters corresponding to the name of the theatre and taxi companies to use for the trip booking. This is not a RESTful design but it serves the purpose of the demo for showing STM in action. In a more realistic example the trip booking details would be specified in the POST request body using a dedicated media format for booking trips.
 
-{
-  "serviceName" : "trip",
-  "threadId" : "vert.x-eventloop-thread-0",
-  "message" : "2 bookings with alt taxi service",
-  "bookingCount" : 2,
-  "altBookingCount" : 2
-}
+The expected output should be similar to:
 
-and a single theatre booking:
+  {
+    "serviceName" : "trip",
+    "threadId" : "vert.x-eventloop-thread-0",
+    "message" : "2 bookings with alt taxi service",
+    "bookingCount" : 2,
+    "altBookingCount" : 2
+  }
+
+Also make a single theatre booking via the theater booking service:
 
   curl -X POST http://localhost:8080/api/theatre/Savoy
 
 giving the following output:
 
-{
-  "serviceName" : "theatre",
-  "threadId" : "vert.x-eventloop-thread-9",
-  "message" : "",
-  "bookingCount" : 3,
-  "altBookingCount" : 0
-}
+  {
+    "serviceName" : "theatre",
+    "threadId" : "vert.x-eventloop-thread-9",
+    "message" : "",
+    "bookingCount" : 3,
+    "altBookingCount" : 0
+  }
 
-observe that each booking is serviced by a different verticle. Check that number of theatre (3) and
+Again observe that each booking is serviced by a different verticle. Check that number of theatre (3) and the
 number of taxi (2) bookings are correct:
 
   curl -X GET http://localhost:8080/api/theatre
@@ -289,23 +324,23 @@ number of taxi (2) bookings are correct:
 
 Which will give the following outputs:
 
-{
-  "serviceName" : "theatre",
-  "threadId" : "vert.x-eventloop-thread-5",
-  "message" : "",
-  "bookingCount" : 3,
-  "altBookingCount" : 0
-}
+  {
+    "serviceName" : "theatre",
+    "threadId" : "vert.x-eventloop-thread-5",
+    "message" : "",
+    "bookingCount" : 3,
+    "altBookingCount" : 0
+  }
 
 and
 
-{
-  "serviceName" : "taxi",
-  "threadId" : "vert.x-eventloop-thread-2",
-  "message" : "",
-  "bookingCount" : 2,
-  "altBookingCount" : 0
-}
+  {
+    "serviceName" : "taxi",
+    "threadId" : "vert.x-eventloop-thread-2",
+    "message" : "",
+    "bookingCount" : 2,
+    "altBookingCount" : 0
+  }
 
 respectively.
 
@@ -315,7 +350,7 @@ Use Case 4: Stress Testing:
 --------------------------
 
 None of the previous use cases demonstrate contention of the STM objects. This next case will start
-use case 1 (theatre booking example) and then make lots of concurrent trip bookings and validate that
+use case 1 (the theatre booking example) and then make lots of concurrent trip bookings and validate that
 the expected number of bookings are made.
 
 Usage:
@@ -329,21 +364,23 @@ and now make lots of concurrent bookings:
 
   mvn exec:java -Pstress
 
-You should see output similar to the folllowing which indicates successful completion:
+The stress test will make 1000 requests to the theatre service spreading the load using 10
+threads. Provided there are no failures you should see output similar to the folllowing which
+indicates successful completion:
 
-[INFO] Scanning for projects...
-[INFO]                                                                         
-[INFO] ------------------------------------------------------------------------
-[INFO] Building Narayana - STM and vertx demo 5.7.2.Final-SNAPSHOT
-[INFO] ------------------------------------------------------------------------
-[INFO] 
-[INFO] --- exec-maven-plugin:1.4.0:java (default-cli) @ stm-vertx-demo ---
-Waiting for 1000 requests
-0 out of 1000 requests failed in 6227 ms
-[INFO] ------------------------------------------------------------------------
-[INFO] BUILD SUCCESS
-[INFO] ------------------------------------------------------------------------
-[INFO] Total time: 2.611s
-[INFO] Finished at: Wed Nov 22 19:22:44 GMT 2017
-[INFO] Final Memory: 16M/362M
-[INFO] ------------------------------------------------------------------------
+  [INFO] Scanning for projects...
+  [INFO]                                                                         
+  [INFO] ------------------------------------------------------------------------
+  [INFO] Building Narayana - STM and vertx demo 5.7.2.Final-SNAPSHOT
+  [INFO] ------------------------------------------------------------------------
+  [INFO] 
+  [INFO] --- exec-maven-plugin:1.4.0:java (default-cli) @ stm-vertx-demo ---
+  Waiting for 1000 requests
+  0 out of 1000 requests failed in 6227 ms
+  [INFO] ------------------------------------------------------------------------
+  [INFO] BUILD SUCCESS
+  [INFO] ------------------------------------------------------------------------
+  [INFO] Total time: 2.611s
+  [INFO] Finished at: Wed Nov 22 19:22:44 GMT 2017
+  [INFO] Final Memory: 16M/362M
+  [INFO] ------------------------------------------------------------------------
