@@ -5,6 +5,8 @@ Conference presentation materials (slides, demonstration code, etc)
 Add a new directory for each conference, JBUG etc that you present at.
 Update this README.md file with a note about the event (and if you did any blogs etc prior to or after the event then those could be added here too).
 
+The aim of these entries is to provide presentations and demonstration code that can be used again by the same author, other members of the Narayana team, or anyone in the wider community. As such there are certain requirements placed upon any entry to this repository. Please see the separate Rules doc for more details.
+
 ## Devoxx UK - May 2017: Transactional Actors with Eclipse Vert.x
 
 Event: [Devoxx UK](https://www.devoxx.co.uk)
