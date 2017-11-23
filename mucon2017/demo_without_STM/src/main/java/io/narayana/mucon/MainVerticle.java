@@ -11,7 +11,7 @@ public class MainVerticle extends AbstractVerticle {
     public static void main(String[] args) {
         flightService = new FlightServiceImpl();
 
-        Vertx.vertx().deployVerticle(MainVerticle.class.getName(), new DeploymentOptions().setInstances(10));
+        Vertx.vertx().deployVerticle(MainVerticle.class.getName(), new DeploymentOptions().setInstances(8));
     }
 
     @Override

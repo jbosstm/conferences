@@ -24,9 +24,9 @@
   </build>
 
   <modules>
-    <module>common</module>
-    <module>flight</module>
-    <module>hotel</module>
-    <module>trip</module>
+    <module>stress</module>
+    <module>demo_without_STM</module>
+    <module>demo_with_STM</module>
+    <module>demo_with_STM_on_openshift</module>
   </modules>
 </project>

@@ -1,175 +1,32 @@
 
-## The steps that I used for the demonstration were as follows
+## Using STM to scale applications
 
-For the live coding demo:
+The functionality of the demonstration application is very simple: it maintains a count of the number of
+bookings made by REST clients, ie the *actor* accepts http POST messages and modifies an internal
+counter and reports the current value back to the client.
 
-Demo 1: Scaling up with more threads, step 1 without STM support
+There are three versions of the same application:
+
+1. [a standard vert.x application with no concurrency support](demo_without_STM/README.md)
+2. [a standard vert.x application with STM support](demo_with_STM/README.md)
+3. [a standard vert.x application with STM support running in a cloud environment](demo_with_STM_on_openshift/README.md)
+
+First build the 3 versions of the demonstration application:
+
 
 ```bash
-mkdir demo; cd demo
-mvn io.fabric8:vertx-maven-plugin:1.0.7:setup -DvertxVersion=3.4.2 -Ddependencies=web
-```
-navigate to the verticles start method in an IDE
-add a vertx route and create an http server and test:
-```bash
-mvn compile vertx:run
-```
-NB the vertx run goal will recompile and redeploy if it detects source changes
-BUT if you change the pom you must restart the run plugin.
-
-*The next three steps are in the directory demo_without_STM*
-
-create a flightService
-add a main: construct flightService and deploy the verticle (update launcher prop in pom)
-add more instances of the vertcle in the Vertx.vertx().deployVerticle step
-stress test to show concurrency issues using:
-
-```bash
-  java -jar stress/target/stress-1.0.jar requests=100 parallelism=50 url=/api
+mvn clean package
 ```
 
-highlight the concurency issue with the flight booking count
+and then try out each step starting with [a version without STM support](demo_without_STM/README.md) which
+shows up issues due to lack of concurrency protection.
+Then try out the [version that adds STM support](demo_with_STM/README.md).
+And finally run a [version of the application](demo_with_STM_on_openshift/README.md) that scales by
+running on more than one JVM.
 
-Demo 1 ctd: step 2 adds STM support
+The instructions for each demo assume you are in the same directory as the demo. If you run the
+code from this directory just specifiy which pom to use (ie -f directory/pom.xml).
 
-add STM support to fix the issue
-  add dependency on org.jboss.narayana.stm and logging to the pom
-  reimport the pom in the IDE
-  add STM annotations to the service interface and implementation
-  create an STM container and objects in the main method
-    - container.create(new FlightServiceImpl());
-  clone it in the route handler
-    - container.clone(new FlightServiceImpl(), flightService);
-  recompile mvn compile vertx:run
-
-rerun the stress test to show that there are no concurrency issues:
-```bash
-  java -jar stress/target/stress-1.0.jar requests=100 parallelism=50 url=/api
-```
-
-# Scaling out with more JVMs using OpenShift
-
-Now show how to share STM across JVMs
-  make the container type PERSISTENT and model SHARED
-  (NB need to prime the object to force it into the store)
-
-Start minishift, login and create a new project and a PVC and deploy the app:
-
-```bash
-> minishift start --vm-driver=virtualbox # or whatever hypervisor you are using
-> minishift console # opens the openshift web console
-> oc login -u developer -p developer
-> oc new-project stmdemo
-```
-
-Create a "Persistent Volume Claim" via the OpenShift console (give it the name "stm-vertx-demo-flight-logs", capacity 1GiB and RWX (Read-Write-Many) Access Mode.
-
-```bash
-> mvn fabric8:deploy -Popenshift -f flight/pom.xml
-> curl -X POST http://stm-vertx-demo-flight-stmdemo.192.168.99.100.nip.io/api/flight/BA123
-```
-
-scale up via the OpenShift console (pointing out the hostId field)
-scale down to zero and back up (pointing out that the booking count was persisted)
-
-## And the following provides more details and provides some other examples you can try out:
-
-### Adding more threads to service a workload
-
-```bash
-mvn exec:java -Pvolatile -Dport=8080 -f flight/pom.xml
-
-curl -X POST http://localhost:8080/api/flight/BA123
-```
-
-Observe that each time the request is issued it is serviced by a different thread (watch the threadId field change).
-
-### Adding more JVMs to service a workload:
-
-This demo shows how different JVMs can share the same transactional memory. We show how
-to run and scale the services using the minishift container platform.
-
-Install minishift:
-
-Download the [relevant binary from](https://github.com/minishift/minishift/releases) and add
-the minishift executable to the path, on linux for example
-
-```bash
-INSTDIR=~/products/openshift/minishift/minishift-1.7.0-linux-amd64
-export PATH=<install location>/minishift-1.7.0-linux-amd64:$PATH
-minishift start --vm-driver=virtualbox # or whatever hypervisor you are using
-minishift console # opens the openshift web console
-oc login -u developer -p developer
-oc new-project stmdemo
-```
-
-The service that we are about to deploy to minishift uses persistant storage so that any data
-survives if a pod crashes. It also needs to be shared by different pods so that the transactional
-memory can be shared between different JVMs. Go to the minishift console and create a
-"Persistent Volume Claim" by clicking on the "Storage" menu option on the left hand pane of the console.
-
-Give it the name "stm-vertx-demo-flight-logs", capacity 1GiB and RWO (Read-Write-Once) Access Mode.
-Now deploy the service:
-
-```bash
-mvn fabric8:deploy -Popenshift -f flight/pom.xml
-```
-
-or use OpenShift online:
-
-```bash
-https://manage.openshift.com/account/index
-create the storage stm-vertx-demo-flight-logs
-oc login -u rhn-engineering-mmusgrov --server=https://console.starter-us-west-1.openshift.com
-mvn fabric8:deploy -Popenshift -f flight/pom.xml
-```
-
-and create a flight booking:
-
-```bash
-curl -X POST http://stm-vertx-demo-flight-stmdemo.192.168.99.100.nip.io/api/flight/BA123
-```
-
-If you periodically query the flight status you should see it being serviced on different threads
-[just as in the earlier demo](adding-more-threads-to-service-a-workload):
-
-```bash
-curl -X GET  http://stm-vertx-demo-flight-stmdemo.192.168.99.100.nip.io/api/flight
-```
-
-Now go back to the console, locate the flight deployment (Deployments -> stm-vertx-demo-flight -> #1)
-and scale up the number of pods to 2.
-Now create some more flight bookings and observe that the requests are serviced by different pods (watch the hostId field change).
-
-
-### Composing STM objects
-
-start the trip verticle which manages theatre, taxi and train bookings:
-```bash
-mvn clean compile exec:java -Ptrip -f trip/pom.xml
-```
-book a theatre and taxi:
-```bash
-curl -X POST http://localhost:8080/api/trip/Apollo/TaxiFirm
-```
-book a theatre and taxi. Abort the taxi and book a train instead:
-```bash
-curl -X POST http://localhost:8080/api/trip/Apollo/fail_TaxiFirm/train
-```
-book a theatre and taxi. Abort the theatre booking and observe that the taxi is cancelled
-```bash
-curl -X POST http://localhost:8080/api/trip/Apollofail/XYZ
-```
-
-@Nested
-  starts a nest txn which commits after the method exits (NB it never aborts)
-
-@TopLevel
-  starts a new txn which commits after the method exits (NB it never aborts)
-
-### Using openshift online:
-
-https://manage.openshift.com/account/index
-
-https://api.starter-us-west-1.openshift.com/oauth/authorize?client_id=openshift-web-console&response_type=code&state=eyJ0aGVuIjoiLyIsIm5vbmNlIjoiMTUwOTY0MTM3MDY2NS0zNDg2OTA1Njc5MjYzOTA0OTAyOTE4ODc2ODM3NTQxMDEwNTg5MzMyMTg0MTIzOTg0MTEwMDEzNzgzMDM3Mjg4NTQwMjgxMzU4MTA3ODc5In0&redirect_uri=https%3A%2F%2Fconsole.starter-us-west-1.openshift.com%2Fconsole%2Foauth
-
+Notice that the cloud based version of the application requires some prerequisite steps
+for installing the OpenShift cloud environment and these are detailed in
+the [README for that step](demo_with_STM_on_openshift/README.md).

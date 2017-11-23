@@ -45,7 +45,7 @@ public class Stress extends AbstractVerticle {
         targetCnt.await();
 
         long duration = (System.nanoTime() - startTime);
-        System.out.printf("%d out of %d requests failed in %d ms%n", failCnt.get(), target, duration / 100000);
+        System.out.printf("%d out of %d requests failed in %d ms%n", failCnt.get(), target, duration / 1000000);
 
         vertx.close();
     }

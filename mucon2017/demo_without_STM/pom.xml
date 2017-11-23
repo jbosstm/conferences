@@ -3,7 +3,7 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
   <groupId>io.narayana</groupId>
-  <artifactId>mucon</artifactId>
+  <artifactId>mucon-without-stm</artifactId>
   <version>1.0</version>
   <properties>
     <vertx.version>3.4.2</vertx.version>
