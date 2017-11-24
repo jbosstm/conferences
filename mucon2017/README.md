@@ -25,7 +25,7 @@ And finally run a [version of the application](demo_with_STM_on_openshift/README
 running on more than one JVM.
 
 The instructions for each demo assume you are in the same directory as the demo. If you run the
-code from this directory just specifiy which pom to use (ie -f directory/pom.xml).
+code from this directory just specify which pom to use (ie -f directory/pom.xml).
 
 Notice that the cloud based version of the application requires some prerequisite steps
 for installing the OpenShift cloud environment and these are detailed in

@@ -65,7 +65,7 @@ dev1.ncl.jboss.com: vert.x-eventloop-thread-0:  Booking Count=1
 ```
 
 The first two fields of the response show the host and thread where the request was handled.
-Note also that if you kill and restart the vert.x application and reissue the POST request
+Note also that if you kill and restart the Vert.x application and reissue the POST request
 you should observe that the old booking count was remembered, as it should for a persistent
 STM object.
 
@@ -75,7 +75,7 @@ STM object.
 
 minishift is a single-node OpenShift cluster running inside a VM.
 
-First you need to [download and install minishift](https://docs.openshift.org/latest/minishift/getting-started/installing.html). After unpacking the binaries for your chosen platorm. Make sure
+First you need to [download and install minishift](https://docs.openshift.org/latest/minishift/getting-started/installing.html). After unpacking the binaries for your chosen platform. Make sure
 the path to the install location is in the run path. minishift needs to run inside a hypervisor
 and in the demo instructions below we assume [VirtualBox](https://www.virtualbox.org/wiki/Downloads) running on linux.
 
@@ -95,7 +95,7 @@ We use the same name as the
 maven artifact id for the demo to simplify the configuration of OpenShift deployments and routes.
 For more details look at the yaml files in the [sources directory](src/main/fabric8).
 
-### Build and deploy the vert.x application to OpenShift
+### Build and deploy the Vert.x application to OpenShift
 
 There is a fabric8 plugin that simplifies OpenShift deployments:
 

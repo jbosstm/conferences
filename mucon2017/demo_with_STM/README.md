@@ -1,5 +1,5 @@
 
-## A simple vert.x application with STM support
+## A simple Vert.x application with STM support
 
 This version builds on the [version without STM support](../demo_without_STM/README.md).
 

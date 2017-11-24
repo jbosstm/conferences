@@ -1,8 +1,8 @@
 
-## A simple vert.x application without concurrency support
+## A simple Vert.x application without concurrency support
 
 The first version of the demonstration code starts 8 instances of the verticle each listening
-for POST requests on a http endpoint. The vert.x runtime manages incoming connection requests
+for POST requests on a http endpoint. The Vert.x runtime manages incoming connection requests
 and distributes them in a round-robin fashion to the connection handlers of each of the verticle
 instances.
 This means that application can concurrently service multiple requests (according to the
@@ -10,7 +10,7 @@ number of instance deployed which you can change via the
 [main method of the MainVerticle](src/main/java/io/narayana/mucon/MainVerticle.java#L14)).
 
 Start the application running (make sure you are in the appropriate directory for the
-demonstartion) using the vertx run plugin (you will already have compiled
+demonstration) using the Vertx run plugin (you will already have compiled
 the example in the previous step):
 
 ```bash
@@ -30,7 +30,7 @@ vert.x-eventloop-thread-1:  Booking Count=2
 The responses indicate the name of the thread that handled the response. Notice that the second
 response indicates that the request was serviced on a different thread than the first request.
 
-In this first version there no concurrency support. We stress test the application to show
+In this first version there is no concurrency support. We stress test the application to show
 why this is a problem (with a view to solving the issue using STM in the next version):
 
 ```bash
@@ -55,8 +55,8 @@ curl -X POST http://localhost:8080/api
 vert.x-eventloop-thread-0:  Booking Count=4993
 ```
 
-The value you see is likely to be different from 4993 but the point is that is will probable
+The value you see is likely to be different from 4993 but the point is that is will probably
 be less than 5000.
 
-In the [next step](../demo_with_STM/README.md) you will fix the concurrecy issue using STM
+In the [next step](../demo_with_STM/README.md) you will fix the concurrency issue using STM.
 
