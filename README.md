@@ -35,3 +35,8 @@ Event: [JBoss User Group Brno](https://developer.jboss.org/wiki/JBugcz-1711Trans
 
 Materials: [presentation and demo](jbug2017)
 
+## January 2018: Transactions for Microservices?
+
+Event: [Snowcamp](https://snowcamp.io/)
+
+Materials: [presentation materials, including demonstration code](201801-transactions-microservices)
