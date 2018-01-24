@@ -65,13 +65,12 @@
             <artifactId>microprofile</artifactId>
         </dependency>
 
-        <!-- LRA JAXRS filters
+        <!-- LRA JAXRS filters -->
         <dependency>
             <groupId>org.jboss.narayana.rts</groupId>
             <artifactId>lra-filters</artifactId>
             <version>${version.io.narayana}</version>
         </dependency>
-         -->
 
         <dependency>
             <groupId>org.jboss.narayana.demo.lrademo</groupId>
