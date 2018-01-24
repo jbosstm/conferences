@@ -51,25 +51,35 @@ public class HotelMicroservice {
 
     @POST
     @Produces(MediaType.APPLICATION_JSON)
-    public Booking reserve(@QueryParam("name") String name) {
+    @LRA
+    public Booking reserve(@HeaderParam(NarayanaLRAClient.LRA_HTTP_HEADER) String bookingId, @QueryParam("name") String name) {
         Booking booking = new Booking(bookingId, name);
         bookingStore.add(booking);
         return booking;
     }
 
-    // Participant
-
-//    public Booking complete() {
-//        return bookingStore.update(bookingId, Booking.BookingStatus.CONFIRMED);
-//    }
-//
-//    public Booking compensate() {
-//        return bookingStore.update(bookingId, Booking.BookingStatus.CANCELLED);
-//    }
-//
+    @GET
     @Path("/{bookingId}")
     @Produces(MediaType.APPLICATION_JSON)
     public Booking get(@PathParam("bookingId") String bookingId) {
         return bookingStore.get(bookingId);
+    }
+
+    // Participant
+
+    @PUT
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/complete")
+    @Complete
+    public Booking complete(@HeaderParam(NarayanaLRAClient.LRA_HTTP_HEADER) String bookingId) {
+        return bookingStore.update(bookingId, Booking.BookingStatus.CONFIRMED);
+    }
+
+    @PUT
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/compensate")
+    @Compensate
+    public Booking compensate(@HeaderParam(NarayanaLRAClient.LRA_HTTP_HEADER) String bookingId) {
+        return bookingStore.update(bookingId, Booking.BookingStatus.CANCELLED);
     }
 }
