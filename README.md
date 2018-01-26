@@ -40,3 +40,9 @@ Materials: [presentation and demo](jbug2017)
 Event: [Snowcamp](https://snowcamp.io/)
 
 Materials: [presentation materials, including demonstration code](201801-transactions-microservices)
+
+## DevConf 2018: Compensating Transactions for the Cloud?
+
+Event: [DevConf](https://devconfcz2018.sched.com/event/DJYD/compensating-transactions-for-the-cloud)
+
+Materials: [presentation materials, including demonstration code](devconf2018-cloud-transactions)
