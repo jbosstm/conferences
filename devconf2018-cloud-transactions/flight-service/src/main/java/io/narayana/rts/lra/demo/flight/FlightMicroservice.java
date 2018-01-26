@@ -60,13 +60,14 @@ public class FlightMicroservice {
     @Path("/{bookingId}")
     @Produces(MediaType.APPLICATION_JSON)
     public Booking cancel(@PathParam("bookingId") String bookingId) throws MalformedURLException {
-        bookingStore.update(bookingId, Booking.BookingStatus.CANCELLED);
+        lraClient.cancelLRA(new URL(bookingId));
         return bookingStore.get(bookingId);
     }
 
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @LRA
+    @NestedLRA
     public Booking reserve(@HeaderParam(NarayanaLRAClient.LRA_HTTP_HEADER) String bookingId, @QueryParam("name") String name) {
         Booking booking = new Booking(bookingId, name);
         bookingStore.add(booking);

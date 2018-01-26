@@ -59,11 +59,15 @@ public class TripMicroservice {
     private Client hotelClient, flightClient;
     private WebTarget hotelTarget, flightTarget;
 
+    @Inject
+    private LRAClient lraClient;
+
     // Business logic
 
     @POST
     @Produces(MediaType.APPLICATION_JSON)
-    public Booking reserve() throws UnsupportedEncodingException {
+    @LRA(delayClose = true, join = false)
+    public Booking reserve(@HeaderParam(NarayanaLRAClient.LRA_HTTP_HEADER) String bookingId) throws UnsupportedEncodingException {
         Booking theGrand = initiateBooking("hotel-TheGrand");
         Booking firstClass = initiateBooking("flight-firstClass");
         Booking economy = initiateBooking("flight-economy");
@@ -79,6 +83,7 @@ public class TripMicroservice {
     @Path("/{bookingId}")
     @Produces(MediaType.APPLICATION_JSON)
     public Booking confirm(@PathParam("bookingId") String bookingId) throws IOException, URISyntaxException {
+        lraClient.closeLRA(new URL(bookingId));
         Booking booking = bookingStore.update(bookingId, Booking.BookingStatus.CONFIRMED);
         for (Booking subBooking : booking.getDetails()) {
             subBooking.merge(getStatus(subBooking));
@@ -90,6 +95,7 @@ public class TripMicroservice {
     @Path("/{bookingId}")
     @Produces(MediaType.APPLICATION_JSON)
     public Booking cancel(@PathParam("bookingId") String bookingId) throws IOException, URISyntaxException {
+        lraClient.cancelLRA(new URL(bookingId));
         Booking booking = bookingStore.update(bookingId, Booking.BookingStatus.CANCELLED);
         for (Booking subBooking : booking.getDetails()) {
             subBooking.merge(getStatus(subBooking));
