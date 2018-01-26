@@ -51,7 +51,8 @@ public class HotelMicroservice {
 
     @POST
     @Produces(MediaType.APPLICATION_JSON)
-    public Booking reserve(@QueryParam("name") String name) {
+    @LRA
+    public Booking reserve(@HeaderParam(NarayanaLRAClient.LRA_HTTP_HEADER) String bookingId, @QueryParam("name") String name) {
         Booking booking = new Booking(bookingId, name);
         bookingStore.add(booking);
         return booking;
@@ -68,7 +69,9 @@ public class HotelMicroservice {
 
     @PUT
     @Produces(MediaType.APPLICATION_JSON)
-    public Booking complete(String bookingId) {
+    @Path("/complete")
+    @Complete
+    public Booking complete(@HeaderParam(NarayanaLRAClient.LRA_HTTP_HEADER) String bookingId) {
         return bookingStore.update(bookingId, Booking.BookingStatus.CONFIRMED);
     }
 
