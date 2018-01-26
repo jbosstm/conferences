@@ -1,0 +1,134 @@
+[mmusgrov@dev1 demo_with_STM_on_openshift2](devconf-brno-2018)$ mvn fabric8:deploy -Popenshift               
+[INFO] Scanning for projects...
+[INFO]                                                                         
+[INFO] ------------------------------------------------------------------------
+[INFO] Building stm-vertx-demo-flight 1.0
+[INFO] ------------------------------------------------------------------------
+[INFO] 
+[INFO] >>> fabric8-maven-plugin:3.2.27:deploy (default-cli) > install @ stm-vertx-demo-flight >>>
+[INFO] 
+[INFO] --- vertx-maven-plugin:1.0.6:initialize (vmp) @ stm-vertx-demo-flight ---
+[INFO] 
+[INFO] --- vertx-maven-plugin:1.0.6:initialize (vmp-init-package) @ stm-vertx-demo-flight ---
+[INFO] 
+[INFO] --- maven-resources-plugin:2.6:resources (default-resources) @ stm-vertx-demo-flight ---
+[INFO] Using 'UTF-8' encoding to copy filtered resources.
+[INFO] Copying 0 resource
+[INFO] 
+[INFO] --- fabric8-maven-plugin:3.2.27:resource (fmp) @ stm-vertx-demo-flight ---
+[INFO] F8: Running in OpenShift mode
+[INFO] F8: Using docker image name of namespace: stmdemo
+[INFO] F8: Running generator vertx
+[INFO] F8: vertx: Using Docker image fabric8/java-alpine-openjdk8-jdk:1.2 as base / builder
+[INFO] F8: Using resource templates from /home/mmusgrov/work/source/forks/narayana/conferences/devconf-brno-2018/demo_with_STM_on_openshift2/src/main/fabric8
+2017-11-23 14:30:12 INFO  Version:30 - HV000001: Hibernate Validator 5.2.4.Final
+[INFO] F8: fmp-service: Adding a default Service with ports [8080]
+[INFO] 
+[INFO] --- maven-compiler-plugin:3.1:compile (default-compile) @ stm-vertx-demo-flight ---
+[INFO] Nothing to compile - all classes are up to date
+[INFO] 
+[INFO] --- maven-resources-plugin:2.6:testResources (default-testResources) @ stm-vertx-demo-flight ---
+[INFO] Using 'UTF-8' encoding to copy filtered resources.
+[INFO] skip non existing resourceDirectory /home/mmusgrov/work/source/forks/narayana/conferences/devconf-brno-2018/demo_with_STM_on_openshift2/src/test/resources
+[INFO] 
+[INFO] --- maven-compiler-plugin:3.1:testCompile (default-testCompile) @ stm-vertx-demo-flight ---
+[INFO] Nothing to compile - all classes are up to date
+[INFO] 
+[INFO] --- maven-surefire-plugin:2.12.4:test (default-test) @ stm-vertx-demo-flight ---
+[INFO] No tests to run.
+[INFO] 
+[INFO] --- maven-jar-plugin:2.4:jar (default-jar) @ stm-vertx-demo-flight ---
+[INFO] Building jar: /home/mmusgrov/work/source/forks/narayana/conferences/devconf-brno-2018/demo_with_STM_on_openshift2/target/stm-vertx-demo-flight-1.0.jar
+[INFO] 
+[INFO] --- vertx-maven-plugin:1.0.6:package (vmp) @ stm-vertx-demo-flight ---
+[INFO] 
+[INFO] --- vertx-maven-plugin:1.0.6:package (vmp-init-package) @ stm-vertx-demo-flight ---
+[INFO] 
+[INFO] --- fabric8-maven-plugin:3.2.27:helm (fmp) @ stm-vertx-demo-flight ---
+[INFO] F8: Creating Helm Chart "stm-vertx-demo-flight" for Kubernetes
+[INFO] Building tar: /home/mmusgrov/work/source/forks/narayana/conferences/devconf-brno-2018/demo_with_STM_on_openshift2/target/stm-vertx-demo-flight-1.0-helm.tar.gz
+[INFO] 
+[INFO] --- fabric8-maven-plugin:3.2.27:build (fmp) @ stm-vertx-demo-flight ---
+[INFO] F8: Using OpenShift build with strategy S2I
+[INFO] F8: Running generator vertx
+[INFO] F8: vertx: Using Docker image fabric8/s2i-java:2.0 as base / builder
+[INFO] Copying files to /home/mmusgrov/work/source/forks/narayana/conferences/devconf-brno-2018/demo_with_STM_on_openshift2/target/docker/stm-vertx-demo-flight/1.0/build/maven
+[INFO] Building tar: /home/mmusgrov/work/source/forks/narayana/conferences/devconf-brno-2018/demo_with_STM_on_openshift2/target/docker/stm-vertx-demo-flight/1.0/tmp/docker-build.tar
+[INFO] F8: [stm-vertx-demo-flight:1.0] "vertx": Created docker source tar /home/mmusgrov/work/source/forks/narayana/conferences/devconf-brno-2018/demo_with_STM_on_openshift2/target/docker/stm-vertx-demo-flight/1.0/tmp/d
+ocker-build.tar
+[INFO] F8: Using BuildConfig stm-vertx-demo-flight-s2i for Source strategy
+[INFO] F8: Adding to ImageStream stm-vertx-demo-flight
+[INFO] F8: Starting Build stm-vertx-demo-flight-s2i
+[INFO] F8: Waiting for build stm-vertx-demo-flight-s2i-10 to complete...
+[INFO] F8: Receiving source from STDIN as archive ...
+[INFO] F8: ==================================================================
+[INFO] F8: Starting S2I Java Build .....
+[INFO] F8: S2I binary build from fabric8-maven-plugin detected
+[INFO] F8: Copying binaries from /tmp/src/maven to /deployments ...
+[INFO] F8: Checking for SpringBoot archive...
+[INFO] F8: Found stm-vertx-demo-flight-1.0.jar...
+[INFO] F8: ... done
+[INFO] F8: 
+[INFO] F8: Pushing image 172.30.1.1:5000/stmdemo/stm-vertx-demo-flight:1.0 ...
+[INFO] F8: Pushed 0/24 layers, 0% complete
+[INFO] F8: Pushed 1/24 layers, 4% complete
+[INFO] F8: Pushed 2/24 layers, 8% complete
+[INFO] F8: Pushed 3/24 layers, 12% complete
+[INFO] F8: Pushed 4/24 layers, 17% complete
+[INFO] F8: Pushed 5/24 layers, 21% complete
+[INFO] F8: Pushed 6/24 layers, 25% complete
+[INFO] F8: Pushed 7/24 layers, 29% complete
+[INFO] F8: Pushed 8/24 layers, 33% complete
+[INFO] F8: Pushed 9/24 layers, 38% complete
+[INFO] F8: Pushed 10/24 layers, 42% complete
+[INFO] F8: Pushed 11/24 layers, 46% complete
+[INFO] F8: Pushed 12/24 layers, 50% complete
+[INFO] F8: Pushed 13/24 layers, 55% complete
+[INFO] F8: Pushed 14/24 layers, 59% complete
+[INFO] F8: Pushed 15/24 layers, 63% complete
+[INFO] F8: Pushed 16/24 layers, 67% complete
+[INFO] F8: Pushed 17/24 layers, 71% complete
+[INFO] WebSocket successfully opened
+[INFO] F8: Build stm-vertx-demo-flight-s2i-10 status: Complete
+[INFO] F8: Build stm-vertx-demo-flight-s2i-10 Complete
+[INFO] WebSocket close received. code: 1000, reason: 
+[WARNING] Ignoring onClose for already closed/closing websocket
+[INFO] F8: Found tag on ImageStream stm-vertx-demo-flight tag: sha256:077535a644254289af678de8dbdc4227bade57e34d6f4e123cfc8323394c8c50
+[INFO] F8: ImageStream stm-vertx-demo-flight written to /home/mmusgrov/work/source/forks/narayana/conferences/devconf-brno-2018/demo_with_STM_on_openshift2/target/stm-vertx-demo-flight-is.yml
+[INFO] 
+[INFO] --- maven-install-plugin:2.4:install (default-install) @ stm-vertx-demo-flight ---
+[INFO] Installing /home/mmusgrov/work/source/forks/narayana/conferences/devconf-brno-2018/demo_with_STM_on_openshift2/target/stm-vertx-demo-flight-1.0.jar to /home/mmusgrov/.m2/repository/io/narayana/stm-vertx-demo-flig
+ht/1.0/stm-vertx-demo-flight-1.0.jar
+[INFO] Installing /home/mmusgrov/work/source/forks/narayana/conferences/devconf-brno-2018/demo_with_STM_on_openshift2/pom.xml to /home/mmusgrov/.m2/repository/io/narayana/stm-vertx-demo-flight/1.0/stm-vertx-demo-flight-
+1.0.pom
+[INFO] Installing /home/mmusgrov/work/source/forks/narayana/conferences/devconf-brno-2018/demo_with_STM_on_openshift2/target/classes/META-INF/fabric8/openshift.yml to /home/mmusgrov/.m2/repository/io/narayana/stm-vertx-
+demo-flight/1.0/stm-vertx-demo-flight-1.0-openshift.yml
+[INFO] Installing /home/mmusgrov/work/source/forks/narayana/conferences/devconf-brno-2018/demo_with_STM_on_openshift2/target/classes/META-INF/fabric8/openshift.json to /home/mmusgrov/.m2/repository/io/narayana/stm-vertx
+-demo-flight/1.0/stm-vertx-demo-flight-1.0-openshift.json
+[INFO] Installing /home/mmusgrov/work/source/forks/narayana/conferences/devconf-brno-2018/demo_with_STM_on_openshift2/target/classes/META-INF/fabric8/kubernetes.yml to /home/mmusgrov/.m2/repository/io/narayana/stm-vertx
+-demo-flight/1.0/stm-vertx-demo-flight-1.0-kubernetes.yml
+[INFO] Installing /home/mmusgrov/work/source/forks/narayana/conferences/devconf-brno-2018/demo_with_STM_on_openshift2/target/classes/META-INF/fabric8/kubernetes.json to /home/mmusgrov/.m2/repository/io/narayana/stm-vert
+x-demo-flight/1.0/stm-vertx-demo-flight-1.0-kubernetes.json
+[INFO] Installing /home/mmusgrov/work/source/forks/narayana/conferences/devconf-brno-2018/demo_with_STM_on_openshift2/target/stm-vertx-demo-flight-1.0-helm.tar.gz to /home/mmusgrov/.m2/repository/io/narayana/stm-vertx-d
+emo-flight/1.0/stm-vertx-demo-flight-1.0-helm.tar.gz
+[INFO] 
+[INFO] <<< fabric8-maven-plugin:3.2.27:deploy (default-cli) < install @ stm-vertx-demo-flight <<<
+[INFO] 
+[INFO] --- fabric8-maven-plugin:3.2.27:deploy (default-cli) @ stm-vertx-demo-flight ---
+[INFO] F8: Using OpenShift at https://192.168.99.100:8443/ in namespace stmdemo with manifest /home/mmusgrov/work/source/forks/narayana/conferences/devconf-brno-2018/demo_with_STM_on_openshift2/target/classes/META-INF/f
+abric8/openshift.yml 
+[INFO] OpenShift platform detected
+[INFO] Using project: stmdemo
+[INFO] Updating a Service from openshift.yml
+[INFO] Updated Service: target/fabric8/applyJson/stmdemo/service-stm-vertx-demo-flight-1.json
+[INFO] Updating DeploymentConfig from openshift.yml
+[INFO] Updated DeploymentConfig: target/fabric8/applyJson/stmdemo/deploymentconfig-stm-vertx-demo-flight-1.json
+[INFO] F8: HINT: Use the command `oc get pods -w` to watch your pods start up
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time: 17.357 s
+[INFO] Finished at: 2017-11-23T14:30:27+00:00
+[INFO] Final Memory: 53M/591M
+[INFO] ------------------------------------------------------------------------
+
