@@ -1,0 +1,100 @@
+Mention fourth module 
+  - simple classes:
+  Booking data object compatible with Json. This will be used by all the microservices to report the booking between layers of the application.
+  An in-memory datastore to store data about the bookings in each respective microservice
+
+As you will recall from the slide showing how the project is structured we have three microservices: hotel, flight and overall trip booking system. 
+  * These map to the modules you can see here
+
+So lets start with the most straight forward part of the application - the hotel microservice.
+
+As you might remember all this microservice does is book hotel rooms. 
+  * As we are using LRA we are also going to need it to define some participant methods to transition the state during completion events.
+  * To participate in an LRA transaction:
+    1. Add the lra-filters dependency
+    2. Add the business logic with the LRA demarcation
+    3. Add a couple of LRA participant callback handlers
+
+The pom:
+  * You can use the WildFly Swarm generator to produce it
+  * Need to add the LRA filters
+
+Transaction demarcation:
+  * This is a pretty simple piece of business logic that adds a booking into our data store
+  * To make it transactional I need to add the LRA attribute
+      As this is the first time we will use one of the LRA annotations. If you look in the IDE you can see that this annotation is quite similar to the JTA 1.2 @Transactional annotation or CMT TX.
+      There are a couple more advanced features we will be looking at shortly so I will leave those for shortly.
+      Conceptually if the type permits it then the transaction will be created before the business logic and completed immediately after it
+        - Not very long but you can control it
+////@SHOW LRA ANNOTATION
+  * Each of my bookings need a unique ID that they can be looked up with during the completion methods so I will use the LRA ID for it
+    * Need headerParam
+
+The next point of interest is the actual participant implementation. 
+  Generally speaking the requirement is to define @Compensate and @Complete annotated methods. 
+  Before we do that lets I will explain a few key properties of a well written participant.
+    Idempotent
+      You can’t guarantee you won’t be called more than once
+    Commutative
+      Changing order doesn't affect result
+  Forward-based
+    What that means is we no longer have the safey net of the virtual time machine that full ACID permits
+      Your actions have to move the business logic forward
+      It does happen to be beneficial as it means you are never really throwing work away
+      Plus whe world is inherently moving forward - so it’s actually a natural way to think
+      Just a couple of examples of this are:
+        Sending an email
+          Can’t cancel an email
+            Must send follow up
+        Refunding a payment
+          Shows a deduction and a refund
+            you have to refund can’t go back in time and prevent receiving money in first place!
+  Let's define them
+    @Path
+    @Compensate/Confirm
+    lraId
+    
+So now we have the Hotel microservice prepared. Lets do the same for the flight microservice.
+
+Initially I will copy over the content as it is similar and then make the changes that I need for the flight microservice. 
+
+I am going to need to add some LRA code to it but first lets paste in the hotel code
+    
+As you might recall from the architecture diagrams I want to allow a customer to independently cancel flights so I have provided a cancel operation
+  * pure business logic and not scoped by an LRA
+  * participant code is identical but to support the ability to cancel individual flight bookings I am going to make the business logic ocurr within a nestedLRA
+    I am also going to make it so the nestedLRA does not complete immediately
+  * I now need to update the cancel operation to actually do something, I will use the LRAClientAPI to cancel this nested transaction
+///@SHOW LRACLIENT
+
+The final microservice we will look at is the trip microservice
+Once again I have provided a simple skeleton of this to deal with Jax-RS calls but we will now plumb it together with the LRA behaviours we need to meet the design of the app.
+1. The first method we will look at is the reserve operation. 
+  Make web calls to create the hotel and alternate flight arrangements
+    cancel the first flight as we managed to book the first. In a real application this might be several interactions.
+  I need to make this business logic an LRA but I don't want this microservice to directly participate in the transaction. I also want to make sure I leave the LRA open when the method completes so that a client can complete it later
+    the delayClose attribute, the join attribute 
+2. We then have a to update the methods the client calls to complete the booking (confirm and cancel)
+    These both use lraClient to complete the TX
+      merge in the data from the participants to update their local view
+
+Given all that code - lets to ahead and run this.
+
+1. mvn clean install
+2. Unzip the distribution from narayana.io
+3. java -jar rts/lra/lra-coordinator-swarm.jar -Dswarm.http.port=8080 -Dswarm.transactions.object-store-path=../lra-coordinator-logs
+4. java -jar rts/lra/lra-coordinator-swarm.jar -Dswarm.http.port=8081 -Dswarm.transactions.object-store-path=../flight-lra-coordinator-logs
+5. java -jar hotel-service/target/lra-test-swarm.jar -Dswarm.http.port=8082
+6. java -jar flight-service/target/lra-test-swarm.jar -Dswarm.http.port=8083 -Dlra.http.port=8081
+7. java -jar ../trip-controller/target/lra-test-swarm.jar -Dswarm.http.port=8084
+8. curl -X POST http://localhost:8084/ | jq
+9. curl -X PUT http://localhost:8084/`urlencode BID`
+10. curl -X POST http://localhost:8084/ | jq
+11. curl -X DELETE http://localhost:8084/`urlencode BID`
+
+I also have all this pre-prepared on my local Minishift PaaS for this part of the demo I am running the same code as before but now I will demostrate the crash recovery side.
+The one item I would point out is that to facilitiate crash recovery I have added a so-called persistent volume to my lra-coordinator processes.
+
+minishift console
+1. curl -X POST http://trip-javaone.`minishift ip`.nip.io/ | jq
+2. curl -X PUT http://trip-javaone.`minishift ip`.nip.io/`urlencode BID` | jq
