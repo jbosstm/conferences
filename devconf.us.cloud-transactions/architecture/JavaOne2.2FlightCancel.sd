@@ -1,0 +1,13 @@
+trip:Microservice
+root:RootLRA[/a]
+subordinate:NestedLRA[a/]
+flight:Microservice
+flightParticipant:Participant
+flightData:DataStore
+
+trip:flight.cancel("firstClass")
+flight:subordinate./cancel
+subordinate:flightParticipant./compensate
+flightParticipant:flightData.update("firstClass", "CANCELLED")
+subordinate:_
+flight:cancelledFlight=flightData.get("firstClass")
