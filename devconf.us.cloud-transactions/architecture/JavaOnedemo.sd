@@ -1,0 +1,38 @@
+client:Client[/a]
+trip:Microservice
+/root:RootLRA[/a]
+hotel:Microservice
+hotelParticipant:Participant
+hotelData:DataStore
+/subordinate:SubordinateLRA[a/]
+flight:Microservice
+flightParticipant:Participant
+flightData:DataStore
+
+client:trip.reserve("TheGrand", "firstClass", "economy")
+trip:root.new(POST)
+
+trip:hotel.reserve("The Grand")
+hotel:root.PUT(hotelParticipant)
+hotel:hotelData.add("TheGrand", "provisional")
+
+[c:for name: "firstClass", "economy"]
+trip:flight.reserve(name)
+flight:subordinate.new(RootLRA)
+subordinate:root.PUT(this)
+flight:subordinate.PUT(flightParticipant)
+flight:flightData.add(name, "provisional")
+[/c]
+
+trip:flight.cancel("firstClass")
+flight:subordinate./cancel
+subordinate:flightParticipant./compensate
+flightParticipant:flightData.cancel("firstClass")
+
+client:trip.confirm()
+trip:root./close
+root:hotelParticipant./complete
+hotelParticipant:hotelData.update("TheGrand", "confirmed")
+root:subordinate./complete
+subordinate:flightParticipant./complete
+flightParticipant:flightData.update("economy", "confirmed")

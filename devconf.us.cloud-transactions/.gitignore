@@ -1,0 +1,6 @@
+target
+*swarm.jar
+narayana-full-*/
+narayana-full-*-bin.zip
+.idea
+*.iml
