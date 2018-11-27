@@ -46,3 +46,10 @@ Materials: [presentation materials, including demonstration code](201801-transac
 Event: [DevConf](https://devconfcz2018.sched.com/event/DJYD/compensating-transactions-for-the-cloud)
 
 Materials: [presentation materials, including demonstration code](devconf2018-cloud-transactions)
+
+## jOpenSpace 2018: Software transaction memory - what is that about
+
+Event: [jOpenSpace 2018](https://www.jopenspace.cz/2018.html)
+
+Materials: [presentation slides](jopenspace2018/software-transaction-memory-overview.pdf)
+
