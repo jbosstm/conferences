@@ -47,7 +47,7 @@ Event: [DevConf](https://devconfcz2018.sched.com/event/DJYD/compensating-transac
 
 Materials: [presentation materials, including demonstration code](devconf2018-cloud-transactions)
 
-Videos: [recording of session](https://www.youtube.com/watch?v=ZC6fhxRX8J4&t=5s)
+Video: [recording of session](https://www.youtube.com/watch?v=ZC6fhxRX8J4&t=5s)
 
 ## jOpenSpace 2018: Software transaction memory - what is that about
 
