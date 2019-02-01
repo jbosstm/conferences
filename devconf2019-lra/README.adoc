@@ -1,0 +1,189 @@
+# MicroProfile LRA demo: DevConf 2019.cz
+
+This is a small demo project which shows
+basic capabilities of MicroProfile Long Running Action (abbreviated to LRA).
+Base concept of transaction handling of the LRA specification is https://www.cs.cornell.edu/andru/cs711/2002fa/reading/sagas.pdf[Saga pattern].
+Saga pattern is designed to provide transactional guarantees for long running transactions
+which is a good fit for the microservice architecture.
+
+LRA is based on HTTP-REST communication.
+Our implementation in http://narayana.io[Narayana] expects a LRA HTTP coordination endpoints to be available.
+
+The Narayana LRA coordinator is responsible to manage LRA lifecycle.
+Application exposes REST endpoints `compensate` and `complete`
+which are called by coordinator to announce the outcome of the LRA.
+
+Some more information about Narayana LRA processing could be found at article
+http://jbossts.blogspot.com/2017/12/narayana-lra-implementation-of-saga.html
+
+## How to run this demo application
+
+To running this you will need
+
+* build LRA specification
+* run LRA coordinator
+* build and start this demo application
+
+NOTE: there are prepared docker images for easier startup, https://github.com/ochaloup/devconf2019-lra#running-this-example-with-prepared-docker-images[see later down here]
+
+[NOTE]
+====
+As the https://github.com/eclipse/microprofile-lra[LRA specification] is not a finalized (January 2019)
+there is no official release of the spec and it's necessary to build the spec API as `-SNAPSHOT`
+locally at your computer.
+====
+
+
+### LRA API compilation
+
+
+* `git clone https://github.com/eclipse/microprofile-lra`
+* `cd microprofile-lra`
+* `mvn clean install`
+
+
+### Starting Narayana LRA coordinator
+
+As the LRA specification is only in a draft state there could be cases that is necessary
+to run the Narayana LRA coordinator as `SNAPSHOT` too. In such case you need to compile
+Narayana project in way
+
+* `git clone https://github.com/jbosstm/narayana.git`
+* `cd narayana`
+* `mvn clean install -DskipTests`
+* `java -jar rts/lra/lra-coordinator/target/lra-coordinator-swarm.jar -Dswarm.http.port=8180`
+
+Otherwise the easiest way is to use the docker to run the coordinator
+(coordinator is at dockerhub at https://hub.docker.com/r/jbosstm/lra-coordinator).
+
+* `docker run -p 8180:8080 jbosstm/lra-coordinator`
+
+To run coordinator with showing `debug`/`trace` messages run with
+`-Dswarm.logging=DEBUG` in case of `java -jar` command or
+set environment variable `-e LOG_LEVEL="DEBUG"`.
+
+
+### Running the demo application
+
+When LRA API is installed as maven dependency to local mvn repository
+and the coordinator is running you can run this demo app.
+The demo application starts as a Thorntail application which exposes
+endpoit to book a flight.
+
+* `git clone https://github.com/ochaloup/devconf2019-lra.git`
+* `cd devconf2019-lra`
+* `mvn package`
+* `java -jar target/devconf2019-flightbooking-thorntail.jar -Dinit.csv=./flight.data -Dlra.http.host=localhost -Dlra.http.port=8180`
+
+NOTE: the `flight.data` is csv file of format `date<yyyy-MM-dd>;seats;seatsBooked`
+      and those data is loaded during application startup
+
+#### How to book a flight and start LRA
+
+Hit endpoint while define JSON. The json says: 'please book a flight at date 2019-01-27 for name "Mr. LRA". Then call next service in chain at addressdefined by "target.call" parameter'.
+
+```bash
+curl -i --header "Content-Type: application/json" -XPOST http://localhost:8080/book --data '{"date":"2019-01-27", "name": "Mr. LRA", "target.call": "http://localhost:8080/book/in-chain"}'
+```
+
+If you don't want to call any other service in chain and let LRA being to run just on that one service use
+
+```bash
+curl -i --header "Content-Type: application/json" -XPOST http://localhost:8080/book --data '{"date":"2019-01-27", "name": "Mr. LRA"}'
+```
+
+For listing all available bookings run `curl -XGET http://localhost:8080/book/all | jq`.
+
+#### Managing flights record as they are
+
+`curl -XGET http://localhost:8080/flights | jq`::
+  show all available flights
+`curl -XGET http://localhost:8080/flights/2 | jq`::
+  get flight entity searched by its id
+`curl -i --header "Content-Type: application/json" -XPOST http://localhost:8080/flights/add --data '{"date":"2018-01-31", "numberOfSeats":100, "bookedSeats": 99}'`::
+  adding new flight to database
+`curl -i -XDELETE http://localhost:8080/flights/2`::
+  delete the flight from database
+`curl -i -XGET http://localhost:8080/flights/date/2018-01-03`::
+  searching for flight by a date
+
+
+## LRA Coordinator : Communicating with coordinator with `curl` commands
+
+NOTE: expecting the coordinator is started at port `8180`. Either with docker `-p 8180:8080`
+      or by WildFly Swarm port definition `swarm.http.port`
+
+To get coordinoator API you can download Swagger JSON by calling
+http://localhost:8080/swagger.json
+Or you can ckeck  
+https://raw.githubusercontent.com/ochaloup/narayana/swagger-json/rts/lra/lra-coordinator/swagger.json[https://github.com/ochaloup/narayana/blob/swagger-json/rts/lra/lra-coordinator/swagger.json]
+for some older version of the API represented by the Swagger JSON.
+
+[NOTE]
+====
+For verification that there is sent data back from coordinator to client service
+you can use some simple HTTP server showing what it gets. For example `http-echo-server`.
+
+```
+npm install http-echo-server -g
+PORT=8081 http-echo-server
+```
+
+====
+
+### Starting LRA
+
+`curl -i -XPOST http://localhost:8080/lra-coordinator/start?clientID=1`
+
+will return the LRA ID as body of the response. It's in form of URI.
+It could be for example `http://localhost:8080/lra-coordinator/0_ffffac110002_-1c1af658_5c45b21d_41`.
+
+### List All active LRAs
+
+`curl -i -XGET http://localhost:8080/lra-coordinator/`
+
+### Enlisting a participant microservice to LRA
+
+`curl -i -XPUT http://localhost:8080/lra-coordinator/0_ffffac110002_-23367453_5c45d7d0_11 --data "http://localhost:8081"`
+
+which will enlist participant at path `http://localhost:8081` expecting the participant exposes
+endpoinds `/compensate`, `/complete` and `/status`.
+
+Or you can define the endpoints particularly by using `Link` header.
+
+```
+curl -i -XPUT  http://localhost:8080/lra-coordinator/0_ffff0a000002_7009eb01_5c463d32_f \
+  -H 'Link:<http://localhost:8081/leave-linkh>; rel="leave"; title="leave URI"; type="text/plain",<http://localhost:8081/complete-linkh>; rel="complete"; title="complete URI"; type="text/plain",<http://localhost:8081/compensate-linkh>; rel="compensate"; title="compensate URI"'
+```
+
+The `complete`, `compensate` endpoints is expected to listen to `PUT` requests. The coordinator provides HTTP header `Long-Running-Action`
+which contains the LRA id that can be used by the participant for the purpose it needs.
+If participants provide some data in body during the `enlist` call then this data will be returned in body
+on the call of `compensate` and `complete`.
+
+To call finish the LRA you can use call either to `close` which informs the coordinator to finish LRA with success (aka. all participants will be called on `complete` endpoint), or you can call cancel
+which informs about LRA failure (aka. all participants will be called on `compensate` endpoint).
+
+* `curl -i -XPUT http://localhost:8080/lra-coordinator/0_ffff0a000002_7009eb01_5c463d32_22/close`
+* `curl -i -XPUT http://localhost:8080/lra-coordinator/0_ffff0a000002_7009eb01_5c463d32_22/cancel`
+
+To find out status of LRA use `/status` `GET` call to coordinator like
+
+`curl -i -XGET http://localhost:8080/lra-coordinator/0_ffff0a000002_7009eb01_5c463d32_22/status`
+
+# Running this example with prepared docker images
+
+* `docker network create lra`
+* `docker run -p 8180:8080 --rm --name coordinator --hostname coordinator --net lra docker.io/ochaloup/lra-coordinator:devconf2019`
+* `docker run --rm -p 8080:8080 -e TARGET_CALL="" -e LRA_ENLIST_BASE_URI="http://lraservice:8080/"  --name lraservice --hostname lraservice  --net lra docker.io/ochaloup/devconf2019:presentation`
+** to debug: `-p 5005:5005 -e JAVA_DEBUG=true`
+* `curl -i --header "Content-Type: application/json" -XPOST http://localhost:8080/book/create --data '{"date":"2019-01-27", "name": "Mr. LRA"}'`
+
+With Ruby
+
+* `git clone https://github.com/adamruzicka/microservice-ruby-dc2019.git` (or https://github.com/ochaloup/microservice-ruby-dc2019)
+* `cd microservice-ruby-dc2019`
+* `docker-compose build`
+* `docker-compose up`
+** or running in 3 different shells: `docker-compose up coordinator`, `docker-compose up lraservice`, `docker-compose up ruby-api`
+
