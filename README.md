@@ -55,3 +55,9 @@ Event: [jOpenSpace 2018](https://www.jopenspace.cz/2018.html)
 
 Materials: [presentation slides](jopenspace2018/software-transaction-memory-overview.pdf)
 
+## Code One SF (September 16–19, 2019)
+
+Event: [JavaOne](https://www.oracle.com/code-one/agenda.html)
+
+Materials: [demonstration code](codeone2019)
+

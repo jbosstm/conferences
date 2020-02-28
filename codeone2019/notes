@@ -1,0 +1,136 @@
+
+cd /home/mmusgrov/src/forks/narayana/conferences/codeone2019
+
+xterm:
+  increase/decrease font size
+  ctrl shift + 
+  ctrl -
+
+Intellij
+    View -> Enter Presentation Mode
+  to show the project pane:
+    alt + alt hold and click on left hand Project pane
+  to show the menu bar:
+    mouse to top of windown and click the icon in the top right
+
+mvn clean package
+=== 1) Describe the non STM version of the app.
+
+Start the example application
+java -jar without-stm/target/codeone-without-stm-quickstart-1.0-SNAPSHOT-runner.jar &
+
+Point out the line that lists which quarkus features are being used
+
+> Installed features: [cdi, resteasy, vertx, vertx-web]
+
+(the build produced a runnable quarkus jar which contains just the required dependencies)
+
+curl -X GET http://localhost:8080/stm
+curl -X POST http://localhost:8080/stm
+
+java -jar stress/target/codeone-stress-1.0.jar requests=100 parallelism=50 url=/stm
+
+curl -X GET http://localhost:8080/stm
+
+The count should be 5001 but it is less than that.
+Given the nature of the talk you may have an idea of what the issue is. But let's take a look:
+
+The FlightResource#book method is RequestScoped.
+Click through from the FlightResource#book call to the getInstance().
+Observe that the instance is ApplicationScoped, ie there is only one instance shared by each request scoped invocation.
+Click through from the flightService#makeBooking method and then to the implementation which is managing a single integer
+but there is no CC.
+
+=== 2) Make the flight services instance transactional
+
+With such a simple app an AtomicInt could be used but in more complex code involving multiple objecs this approach may not be so trivial. So for the purpose of the demo I'll show how to turn the flightServiceImpl into a transactional object:
+
+Add a maven dependency on the STM implementation (org.jboss.narayana.stm:stm:5.9.9.Final-SNAPSHOT
+
+Kill the running java app.
+Start the app using the quarkus maven dev plugin:
+
+mvn package quarkus:dev -f without-stm/pom.xml &
+
+Annotate the service interface with @Transactional: Defines that implementations of the interface are
+to be managed within a transactional container.
+Click through to the interface implementation.
+ - Explain that by default all state will be managed and all public methods will be considered to mutate state.
+ - this is to coarse grained (reminisent of global locks)
+   * so lets tell the STM library which state is to me shared and which methods read and/or write state.
+Now that the transactional object is defined we need to make the app resource use a proxy and the STM system
+will intercept accesses:
+ - in FlightServiceFactory#constructor create a container = new Container<FlightService>(); with the default
+   properties (volatile). Explain that containers are typed.
+ - change the getInstance method to return a handle to a managed instance (as opposed to the unmanaged one):
+   return container.clone(new FlightServiceImpl(), flightService);
+
+ Explain that now the instance is fully transactional. However, the access now need to be performed inside a transaction:
+ Two options:
+ - use atomic blocks
+
+   AtomicAction A = new AtomicAction();
+   A.begin();
+   access state
+   A.commit();
+
+ - or use an STM annotation, such as @NestedTopLevel, that will automatically begin a transaction on entry to the
+   method and ends it on exit:
+   Go back to the interface and add @Nested to the class
+
+Now test it
+
+curl -X POST http://localhost:8080/stm
+
+Explain that the quarkus:dev plugin supports live reload for a good developer experience.
+
+java -jar stress/target/codeone-stress-1.0.jar requests=100 parallelism=50 url=/stm
+
+kill the app
+
+=== 3) Run it on OpenShift, an application container plaform
+
+start minishif and login with the valid credentials
+  minishift start --vm-driver=virtualbox
+  oc login -u developer -p developer
+start with a clean project
+  oc delete project stmdemo
+
+create a new project:
+  export APP=with-persistence
+  oc new-project stmdemo
+create and start a new build using the app sources (and docker - maybe cat Dockerfile):
+  oc new-build --binary --name=${APP} -l app=${APP}
+  oc start-build ${APP} --from-dir=. --follow
+we will need some storage to put the STM logs
+  . ../pv.sh
+create an app using the image we have just built:
+  oc new-app ${APP} -l app=${APP}
+and mount the pv at a location know by the STM implementation
+(cat src/main/resources/jbossts-properties.xml):
+  oc set volume dc/${APP} --add --type pvc --claim-name stm-logs --mount-path /deployments/data
+enable netork access to the app:
+  oc expose service ${APP}
+  oc get route
+
+curl -XGET http://with-persistence-stmdemo.192.168.99.101.nip.io/stm
+
+recap what we have done:
+  - the app is using the Narayana's persistent shared STM implementation using the relevant container constructor:
+    new Container<>(Container.TYPE.PERSISTENT, Container.MODEL.SHARED);
+  - since the STM object is to be shared between different pods we
+    * created a PV
+    * mounted it at a location known to Narayana STM (see jbossts-properties.xml)
+scale up via the `minishift console` and run post twice, checking that the requests
+  round robbin (the POST response shows different pod ip addresses handling the request)
+  show that the booking count is consistent.
+scale down to zero and back up again showing that the booking count is still valid
+
+== 4) Composing operations on transactional objects
+
+Trip resource:
+ - begins an atomic block
+ - books a flight
+   - begins a nested atomic block
+   - fails to book preferred taxi so aborts the nested transaction
+ - books the alternative taxi in the top level transaction

@@ -1,0 +1,19 @@
+# build an stm quarkus extension 
+cd /home/mmusgrov/src/forks/quarkus/quarkus/extensions/narayana-stm
+
+
+tar -zxf graalvm-ce-linux-amd64-19.2.0.1.tar.gz 
+  export GRAALVM_HOME=/home/mmusgrov/products/graal/graalvm-ce-19.2.0.1
+ export GRAALVM_HOME=`pwd`/graalvm-ce-19.2.0.1
+ export PATH=$GRAALVM_HOME/bin:$PATH
+ gu install native-image
+ git clone https://github.com/graalvm/graalvm-demos
+ cd graalvm-demos/
+ vi README.md 
+ cd native-list-dir/
+ vi README.md 
+ ./build.sh 
+ native-image ListDir
+ vi ListDir.java 
+ ./listdir 
+ vi ~/products/graal/notes
