@@ -1,0 +1,10 @@
+= Presentation for DevConf.cz 2021
+
+**Narayana: Java library for transaction processing**
+
+Slides at link:./slides.pdf[]
+
+The presentation talks about Narayana project
+and contains several source code modules
+which illustrates the functionality.
+

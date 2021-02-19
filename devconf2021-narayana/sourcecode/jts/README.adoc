@@ -1,0 +1,48 @@
+= JTS Narayana example
+
+Adapted from
+https://github.com/jbosstm/quickstart/tree/master/jts-docker
+
+== How to run
+
+Prepare Podman[https://podman.io] pod for deploy
+the Jacorb naming server and JTS transaction service.
+
+[source,sh]
+----
+podman pod create --name jts -p 127.0.0.1:3528:3528 -p 127.0.0.1:4711:4711
+----
+
+Start the naming server and JTS Narayana transaction manager
+
+[source,sh]
+----
+podman run --pod jts --rm -it  --name jacorb-name-server \
+  jboss/jacorb-name-server
+podman run -e "JACORB_NAME_SERVER_ENV_NAME_SERVER_PORT=3528" \
+           -e "JACORB_NAME_SERVER_IP=127.0.0.1" \
+  --pod jts -it --rm --name jts-transaction-service \
+  jboss/jts-transaction-service
+----
+
+With services running we can compile the sources
+and run the resources.
+Before starting it's necessary to find IP address which is
+reachable from the Podman containers (pods),
+e.g. use `ifconfig`. The IP address then pass to the `java` command.
+
+
+[source,sh]
+----
+mvn clean install
+# ifconfig
+CLIENT_IP=192.168.122.1
+
+java -Dclient.ip=$CLIENT_IP -cp target/jts-example-1.0.0.Final-SNAPSHOT-jar-with-dependencies.jar io.narayana.JTSMain
+
+# to rollback
+java -Dclient.ip=$CLIENT_IP -Daction=ROLLBACK -cp target/jts-example-1.0.0.Final-SNAPSHOT-jar-with-dependencies.jar io.narayana.JTSMain
+
+# to resource rollback
+java -Dclient.ip=$CLIENT_IP -Daction=RESOURCE_ROLLBACK -cp target/jts-example-1.0.0.Final-SNAPSHOT-jar-with-dependencies.jar io.narayana.JTSMain
+----
