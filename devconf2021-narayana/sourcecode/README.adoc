@@ -1,0 +1,6 @@
+= Demo source code
+
+These are demo sources that are used in presentation
+to illustrate the particular Narayana modules.
+Each module contains own README.adoc
+describing where the source comes from and how to run it.

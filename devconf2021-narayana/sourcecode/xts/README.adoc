@@ -1,0 +1,6 @@
+= XTS / WS-AT
+
+The example can be observed at:
+https://github.com/jbosstm/quickstart/tree/master/XTS/wsat-jta-multi_service
+
+

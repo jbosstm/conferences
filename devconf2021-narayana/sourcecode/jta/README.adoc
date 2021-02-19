@@ -1,0 +1,22 @@
+= JTA in Quarkus example
+
+Adapted from
+https://github.com/quarkusio/quarkus-quickstarts/tree/master/hibernate-orm-panache-quickstart
+
+This works with Qurakus ORM Panache accessing the H2 in memory database.
+
+The `Resources` uses the CDI `@Transactional`
+and adds some JTA API calls on top of it.
+
+JTA API doc
+
+* https://github.com/eclipse-ee4j/jta-api/tree/master/api/src/main/java/jakarta/transaction
+* https://docs.oracle.com/en/java/javase/11/docs/api/java.transaction.xa/javax/transaction/xa/package-summary.html
+
+
+To run
+
+[source,sh]
+----
+mvn clean test
+----

@@ -1,0 +1,10 @@
+= STM example
+
+Adopted from quarkus guide: https://quarkus.io/guides/software-transactional-memory
+
+To run
+
+[source,sh]
+----
+mvn clean test
+----

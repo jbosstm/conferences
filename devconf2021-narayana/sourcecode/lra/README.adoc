@@ -1,0 +1,52 @@
+= LRA example
+
+A demo project on MicroProfile Long Running Action (LRA).
+Base concept of transaction handling of the LRA specification is https://www.cs.cornell.edu/andru/cs711/2002fa/reading/sagas.pdf[Saga pattern]. Specification of LRA can be found at https://github.com/eclipse/microprofile-lra/blob/master/spec/src/main/asciidoc/microprofile-lra-spec.adoc.
+
+== How to run
+
+* Start LRA coordinator
+
+[source,sh]
+----
+docker run -p 8080:8080 --rm --name lra-coordinator \
+    jbosstm/lra-coordinator:5.10.6.Final
+----
+
+* Starting the service (running with Thorntail)
+
+[source,sh]
+----
+# compile sources
+mvn package
+
+# find accessible IP address that the Docker may reach
+ifconfig
+IP_ADDRESS=192.168.0.101
+
+# start the service once
+java -Dthorntail.http.port=8180 -Dthorntail.bind.address=$IP_ADDRESS -Dlra.coordinator.url='http://localhost:8080'  -jar target/devconf2021-adventurer-service-thorntail.jar
+
+# start the service for the second time
+java -Dthorntail.http.port=8280 -Dthorntail.bind.address=$IP_ADDRESS -Dlra.coordinator.url='http://localhost:8080'  -jar target/devconf2021-adventurer-service-thorntail.jar
+----
+
+To call the REST API to start and end the LRA tasks
+
+[source,sh]
+----
+# to call only the first service
+curl -i --header "Content-Type: application/json" -XPOST http://localhost:8180/thief --data '{"name": "Steal the gem", "target.call": ""}'
+
+# to call the first service which calls the second one
+curl -i --header "Content-Type: application/json" -XPOST http://192.168.122.1:8180/thief --data '{"name": "Steal and fight in the forest", "target.call": "http://192.168.122.1:8280/warrior"}'
+----
+
+
+For listing all available thief and warrior tasks, run
+
+[source, sh]
+----
+curl -XGET http://${IP_ADDRESS}:8180/thief/all | jq
+curl -XGET http://${IP_ADDRESS}:8280/warrior/all | jq
+----
