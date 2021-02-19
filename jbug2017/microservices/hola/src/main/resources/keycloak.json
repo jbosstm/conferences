@@ -1,0 +1,8 @@
+{
+  "realm": "helloworld-msa",
+  "bearer-only": true,
+  "enable-cors": true,
+  "auth-server-url": "${env.KEYCLOAK_AUTH_SERVER_URL}",
+  "ssl-required": "none",
+  "resource": "hola"
+}

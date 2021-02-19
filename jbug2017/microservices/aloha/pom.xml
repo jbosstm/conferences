@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+	JBoss, Home of Professional Open Source
+	Copyright 2016, Red Hat, Inc. and/or its affiliates, and individual
+	contributors by the @authors tag. See the copyright.txt in the
+	distribution for a full listing of individual contributors.
+
+	Licensed under the Apache License, Version 2.0 (the "License");
+	you may not use this file except in compliance with the License.
+	You may obtain a copy of the License at
+	http://www.apache.org/licenses/LICENSE-2.0
+	Unless required by applicable law or agreed to in writing, software
+	distributed under the License is distributed on an "AS IS" BASIS,
+	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+	See the License for the specific language governing permissions and
+	limitations under the License.
+-->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>com.redhat.developers.msa.aloha</groupId>
+	<artifactId>aloha</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<packaging>jar</packaging>
+
+	<name>aloha</name>
+	<description>Demo project for Vert.x</description>
+
+	<properties>
+		<!-- Explicitly declaring the source encoding eliminates the following
+			message: -->
+		<!-- [WARNING] Using platform encoding (UTF-8 actually) to copy filtered
+			resources, i.e. build is platform dependent! -->
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+		<java.main.class>io.vertx.core.Launcher</java.main.class>
+		<vertx.main.verticle>com.redhat.developers.msa.aloha.AlohaVerticle</vertx.main.verticle>
+
+		<!-- maven-compiler-plugin -->
+		<maven.compiler.source>1.8</maven.compiler.source>
+		<maven.compiler.target>1.8</maven.compiler.target>
+
+		<!-- other plugin versions -->
+		<openfeign.version>9.4.0</openfeign.version>
+		<version.opentracing>0.22.0</version.opentracing>
+		<openfeign.opentracing.version>0.0.3</openfeign.opentracing.version>
+		<vertx.version>3.3.3</vertx.version>
+		<hystrix.version>1.5.1</hystrix.version>
+		<version.exec.plugin>1.4.0</version.exec.plugin>
+		<version.jaeger>0.19.0</version.jaeger>
+		<version.narayana>5.7.1.Final</version.narayana>
+		<version.resteasy.client>3.0.14.Final</version.resteasy.client>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>io.vertx</groupId>
+			<artifactId>vertx-core</artifactId>
+			<version>${vertx.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>io.vertx</groupId>
+			<artifactId>vertx-web</artifactId>
+			<version>${vertx.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>io.vertx</groupId>
+			<artifactId>vertx-auth-jwt</artifactId>
+			<version>${vertx.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>javax.servlet-api</artifactId>
+			<version>3.1.0</version>
+		</dependency>
+
+		<!-- Feign -->
+		<dependency>
+			<groupId>io.github.openfeign.opentracing</groupId>
+			<artifactId>feign-hystrix-opentracing</artifactId>
+			<version>${openfeign.opentracing.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>io.github.openfeign</groupId>
+			<artifactId>feign-httpclient</artifactId>
+			<version>${openfeign.version}</version>
+		</dependency>
+
+		<!-- Vertx Hystrix Stream -->
+		<dependency>
+			<groupId>com.github.kennedyoliveira</groupId>
+			<artifactId>hystrix-vertx-metrics-stream</artifactId>
+			<version>${hystrix.version}</version>
+		</dependency>
+
+		<!-- OpenTracing -->
+		<dependency>
+			<groupId>io.opentracing</groupId>
+			<artifactId>opentracing-noop</artifactId>
+			<version>${version.opentracing}</version>
+		</dependency>
+
+		<!-- OpenTracing implementation - Jaeger -->
+		<dependency>
+			<groupId>com.uber.jaeger</groupId>
+			<artifactId>jaeger-core</artifactId>
+			<version>${version.jaeger}</version>
+		</dependency>
+
+		<!-- Narayana -->
+		<dependency>
+			<groupId>org.jboss.narayana.rts</groupId>
+			<artifactId>lra-client</artifactId>
+			<version>${version.narayana}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.jboss.resteasy</groupId>
+			<artifactId>resteasy-client</artifactId>
+			<version>${version.resteasy.client}</version>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<finalName>aloha</finalName>
+		<plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>exec-maven-plugin</artifactId>
+				<version>${version.exec.plugin}</version>
+				<configuration>
+					<mainClass>${java.main.class}</mainClass>
+					<arguments>
+						<argument>run</argument>
+						<argument>${vertx.main.verticle}</argument>
+					</arguments>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-shade-plugin</artifactId>
+				<version>2.4.3</version>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>shade</goal>
+						</goals>
+						<configuration>
+							<transformers>
+								<transformer
+									implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+									<manifestEntries>
+										<Main-Class>${java.main.class}</Main-Class>
+										<Main-Verticle>${vertx.main.verticle}</Main-Verticle>
+									</manifestEntries>
+								</transformer>
+							</transformers>
+							<outputFile>${project.build.directory}/${project.artifactId}-fat.jar
+							</outputFile>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>

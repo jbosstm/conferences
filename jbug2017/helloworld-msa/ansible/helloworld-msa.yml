@@ -1,0 +1,152 @@
+---
+- name: Install Helloworld-MSA in OpenShift
+  hosts: localhost
+  vars_files:
+    - vars.yml
+  tasks:
+
+    - include: setup.yml
+
+    - name: Login in OpenShift
+      shell: "oc login --insecure-skip-tls-verify=true -u {{ username }} -p {{ password }} {{ openshift }}"
+      tags:
+        - openshift
+
+    - name: Create a new OpenShift project
+      shell: "oc new-project {{ project_name }}"
+      register: command_result
+      failed_when: "'exists' not in command_result.stderr and command_result.rc != 0"
+      changed_when: "'exists' not in command_result.stderr"
+      tags:
+        - openshift
+
+    - name: Define OpenShift project
+      shell: "oc project {{ project_name }}"
+      tags:
+        - openshift
+
+      # Install Jaeger before applications, to make Jaeger's agent ready for connections.
+      # If Jaeger's agent is deployed after apps it can take some time to open connections.
+      # Redeploy apps: oc env dc -l app JAEGER_SERVER_HOSTNAME=jaeger-all-in-one
+    - name: Install Jeager
+      shell: "oc process -f https://raw.githubusercontent.com/jaegertracing/jaeger-openshift/0.1.2/all-in-one/jaeger-all-in-one-template.yml | oc create -f - && oc expose service jaeger-all-in-one --name jaeger-msa-domain --hostname=jaeger-{{ project_name }}.{{ domain }}"
+      when: "deploy_jaeger"
+      register: command_result
+      failed_when: "'exists' not in command_result.stderr and command_result.rc != 0"
+      changed_when: "'exists' not in command_result.stderr"
+      tags:
+        - openshift
+        - opentracing
+        - jaeger
+
+    - name: Create OpenShift new-build
+      shell: "oc new-build --binary --name={{ item.name }} -l app={{ item.name }}"
+      register: command_result
+      with_items: "{{ msa_projects }}"
+      failed_when: "'exists' not in command_result.stderr and command_result.rc != 0"
+      changed_when: "'exists' not in command_result.stderr"
+      tags:
+        - openshift
+
+    - name: Build and Deploy OpenShift images from the sources
+      shell: "oc start-build {{ item.name }} --from-dir={{ workdir }}/{{ item.name }} --follow"
+      with_items: "{{ msa_projects }}"
+      tags:
+        - openshift
+        - build
+
+    - name: Create OpenShift applications from previously created images
+      shell: "oc new-app {{ item.name }} -l app={{ item.name }}{{ (item.hystrix == True) | ternary(',hystrix.enabled=true','') }} {{ (deploy_jaeger) | ternary('-e JAEGER_SERVER_HOSTNAME=jaeger-all-in-one','') }}"
+      register: command_result
+      with_items: "{{ msa_projects }}"
+      failed_when: "'exists' not in command_result.stderr and command_result.rc != 0"
+      changed_when: "'exists' not in command_result.stderr"
+      tags:
+        - openshift
+
+    - name: Tell microservices where to find the Jaeger server
+      shell: "oc env dc {{ item.name }} JAEGER_SERVER_HOSTNAME=jaeger-all-in-one ENABLE_JAEGER=true"
+      register: command_result
+      with_items: "{{ msa_projects }}"
+      when: "deploy_jaeger"
+      tags:
+        - openshift
+        - opentracing
+        - jaeger
+
+    - name: Expose OpenShift applications
+      shell: "oc expose service {{ item.name }} --hostname={{ item.name }}-{{ project_name }}.{{ domain }}"
+      register: command_result
+      with_items: "{{ msa_projects }}"
+      failed_when: "'exists' not in command_result.stderr and command_result.rc != 0"
+      changed_when: "'exists' not in command_result.stderr"
+      tags:
+        - openshift
+
+    - name: Define Frontend domain
+      shell: "oc env dc/frontend OS_SUBDOMAIN={{ domain }}"
+      tags:
+        - openshift
+
+    - name: Setup Frontend project to know where to points requests
+      shell: "oc env dc/frontend OS_PROJECT={{ project_name }}"
+      tags:
+        - openshift
+
+    - name: Create OpenShift Readiness Probe for applications
+      shell: "oc set probe dc/{{ item.name }} --readiness --get-url={{ item.probe }}"
+      register: command_result
+      with_items: "{{ msa_projects }}"
+      # Avoid projects without probe
+      when: "item.probe != False"
+      tags:
+        - openshift
+
+    - name: Enable Jolokia for applications
+      shell: "oc env dc/{{ item.name }} AB_ENABLED=jolokia; oc patch dc/{{ item.name }} -p '{\"spec\":{\"template\":{\"spec\":{\"containers\":[{\"name\":\"{{ item.name }}\",\"ports\":[{\"containerPort\": 8778,\"name\":\"jolokia\"}]}]}}}}'"
+      register: command_result
+      with_items: "{{ msa_projects }}"
+      # Avoid  no Jolokia projects
+      when: "item.jolokia != False"
+      tags:
+        - openshift
+
+    - name: Checkout LRA template from Github
+      git:
+        repo: "https://github.com/jbosstm/jboss-dockerfiles"
+        dest: "{{ workdir }}/jboss-dockerfiles"
+        update: yes
+      when: "clone_modules"
+      tags:
+        - git
+
+    - name: Import LRA template
+      shell: "cat {{ workdir }}/jboss-dockerfiles/lra/openshift-template/lra-coordinator-template.yaml | oc create -f -"
+      register: command_result
+      failed_when: "'exists' not in command_result.stderr and command_result.rc != 0"
+      changed_when: "'exists' not in command_result.stderr"
+      tags:
+        - openshift
+
+    - name: Create OpenShift applications for LRA
+      shell: "oc new-app --template=lra-coordinator -p APPLICATION_NAME=lra-coordinator"
+      register: command_result
+      failed_when: "'exists' not in command_result.stderr and command_result.rc != 0"
+      changed_when: "'exists' not in command_result.stderr"
+      tags:
+        - openshift
+
+    #Install Kubeflix
+    - include: kubeflix.yml
+    
+    # Install Jenkins
+    - include: jenkins.yml
+
+    # Install SSO
+    - include: sso.yml
+
+    - name: Use OpenShift MSA project
+      shell: "oc project {{ project_name }}"
+      tags:
+        - openshift
+ 

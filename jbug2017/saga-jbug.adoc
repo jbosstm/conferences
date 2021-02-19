@@ -263,7 +263,7 @@ To get logs for the particular services:
 
 * https://github.com/eclipse/microprofile-sandbox/tree/master/proposals/0009-LRA
 * https://github.com/jbosstm/narayana/tree/master/rts/lra
-* https://github.com/ochaloup/helloworld-msa/tree/lra
+* https://github.com/jbosstm/conferences/tree/master/jbug2017/helloworld-msa
 
 == !
 
