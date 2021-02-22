@@ -1,0 +1,52 @@
+// JBoss, Home of Professional Open Source
+// Copyright 2016, Red Hat, Inc. and/or its affiliates, and individual
+// contributors by the @authors tag. See the copyright.txt in the
+// distribution for a full listing of individual contributors.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+// http://www.apache.org/licenses/LICENSE-2.0
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+## Deploy namaste (Dropwizard) microservice
+
+Choose one of the following options/approaches to deploy this microservice.
+
+### Option 1: Deploy using Fabric8 plugin
+
+Execute:
+
+----
+$ git clone https://github.com/redhat-helloworld-msa/namaste
+$ cd namaste/
+$ mvn clean package docker:build fabric8:json fabric8:apply
+----
+
+### Option 2: Deploy project via oc CLI
+
+#### Basic project creation
+
+----
+$ git clone https://github.com/redhat-helloworld-msa/namaste
+$ cd namaste/
+$ oc new-build --binary --name=namaste -l app=namaste
+$ mvn package; oc start-build namaste --from-dir=. --follow
+$ oc new-app namaste -l app=namaste,hystrix.enabled=true
+$ oc expose service namaste
+----
+
+#### (Optional) Enable Jolokia and Readiness probe
+
+----
+$ oc patch dc/namaste -p '{"spec":{"template":{"spec":{"containers":[{"name":"namaste","ports":[{"containerPort": 8778,"name":"jolokia"}]}]}}}}'
+$ oc patch dc/namaste -p '{"spec":{"template":{"spec":{"containers":[{"name":"namaste","readinessProbe":{"httpGet":{"path":"/api/health","port":8080}}}]}}}}'
+----
+
+### Test the service endpoint
+
+Access: http://namaste-helloworld-msa.rhel-cdk.10.1.2.2.xip.io/api/namaste

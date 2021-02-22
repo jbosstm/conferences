@@ -1,0 +1,1706 @@
+{
+    "kind": "List",
+    "apiVersion": "v1",
+    "items": [
+            {
+            "kind": "ImageStream",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "aloha",
+                "labels": {
+                    "hystrix.enabled": "true"
+                }
+            },
+            "spec": {
+                "tags": [
+                    {
+                        "name": "latest",
+                        "from": {
+                            "kind": "DockerImage",
+                            "name": "redhatmsa/aloha:latest"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "kind": "ImageStream",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "api-gateway",
+                "labels": {
+                    "build": "api-gateway"
+                }
+            },
+            "spec": {
+                "tags": [
+                    {
+                        "name": "latest",
+                        "from": {
+                            "kind": "DockerImage",
+                            "name": "redhatmsa/api-gateway:latest"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "kind": "ImageStream",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "bonjour",
+                "labels": {
+                    "app": "bonjour"
+                }
+            },
+            "spec": {
+                "tags": [
+                    {
+                        "name": "latest",
+                        "from": {
+                            "kind": "DockerImage",
+                            "name": "redhatmsa/bonjour:latest"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "kind": "ImageStream",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "frontend",
+                "labels": {
+                    "app": "frontend"
+                }
+            },
+            "spec": {
+                "tags": [
+                    {
+                        "name": "latest",
+                        "from": {
+                            "kind": "DockerImage",
+                            "name": "redhatmsa/frontend:latest"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "kind": "ImageStream",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "hello",
+                "labels": {
+                    "hystrix.enabled": "true"
+                }
+            },
+            "spec": {
+                "tags": [
+                    {
+                        "name": "latest",
+                        "from": {
+                            "kind": "DockerImage",
+                            "name": "redhatmsa/hello:latest"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "kind": "ImageStream",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "hola",
+                "labels": {
+                    "hystrix.enabled": "true"
+                }
+            },
+            "spec": {
+                "tags": [
+                    {
+                        "name": "latest",
+                        "from": {
+                            "kind": "DockerImage",
+                            "name": "redhatmsa/hola:latest"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "kind": "ImageStream",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "namaste",
+                "labels": {
+                    "build": "namaste"
+                }
+            },
+            "spec": {
+                "tags": [
+                    {
+                        "name": "latest",
+                        "from": {
+                            "kind": "DockerImage",
+                            "name": "redhatmsa/namaste:latest"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "kind": "ImageStream",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "ola",
+                "labels": {
+                    "build": "ola"
+                }
+            },
+            "spec": {
+                "tags": [
+                    {
+                        "name": "latest",
+                        "from": {
+                            "kind": "DockerImage",
+                            "name": "redhatmsa/ola:latest"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "kind": "BuildConfig",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "aloha",
+                "labels": {
+                    "hystrix.enabled": "true"
+                }
+            },
+            "spec": {
+                "triggers": [
+                    {
+                        "type": "GitHub",
+                        "github": {
+                            "secret": "UWX1Fhg88GdtQfRI4eYj"
+                        }
+                    },
+                    {
+                        "type": "Generic",
+                        "generic": {
+                            "secret": "Q69CugAX97YatJJF-tLo"
+                        }
+                    }
+                ],
+                "source": {
+                    "type": "Git",
+                    "git": {
+                        "uri": "https://github.com/redhat-helloworld-msa/aloha"
+                    }
+                },
+                "strategy": {
+                  "type": "Source",
+                   "sourceStrategy": {
+                      "from": {
+                         "kind": "ImageStreamTag",
+                         "name": "vertx-s2i:latest"
+                      }
+                   }
+                },
+                "output": {
+                    "to": {
+                        "kind": "ImageStreamTag",
+                        "name": "aloha:latest"
+                    }
+                }
+            }
+        },
+        {
+            "kind": "BuildConfig",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "api-gateway",
+                "labels": {
+                    "build": "api-gateway"
+                }
+            },
+            "spec": {
+                "triggers": [
+                    {
+                        "type": "GitHub",
+                        "github": {
+                            "secret": "db04uu162wFjZYj77pGa"
+                        }
+                    },
+                    {
+                        "type": "Generic",
+                        "generic": {
+                            "secret": "v9tNdbII5PjB_wcrhNQ0"
+                        }
+                    }
+                ],
+                "source": {
+                    "type": "Binary",
+                    "binary": {}
+                },
+                "strategy": {
+                    "type": "Docker",
+                    "dockerStrategy": {}
+                },
+                "output": {
+                    "to": {
+                        "kind": "ImageStreamTag",
+                        "name": "api-gateway:latest"
+                    }
+                }
+            }
+        },
+        {
+            "kind": "BuildConfig",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "bonjour",
+                "labels": {
+                    "app": "bonjour"
+                }
+            },
+            "spec": {
+                "triggers": [
+                    {
+                        "type": "GitHub",
+                        "github": {
+                            "secret": "ywzgOVL7kgE1Rojvej__"
+                        }
+                    },
+                    {
+                        "type": "Generic",
+                        "generic": {
+                            "secret": "OPZFTjXJtg3lR72FTDCD"
+                        }
+                    }
+                ],
+                "source": {
+                    "type": "Git",
+                    "git": {
+                        "uri": "https://github.com/redhat-helloworld-msa/bonjour"
+                    }
+                },
+                "strategy": {
+                    "type": "Source",
+                    "sourceStrategy": {
+                        "from": {
+                            "kind": "ImageStreamTag",
+                            "namespace": "openshift",
+                            "name": "nodejs:latest"
+                        }
+                    }
+                },
+                "output": {
+                    "to": {
+                        "kind": "ImageStreamTag",
+                        "name": "bonjour:latest"
+                    }
+                }
+            }
+        },
+        {
+            "kind": "BuildConfig",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "frontend",
+                "labels": {
+                    "app": "frontend"
+                }
+            },
+            "spec": {
+                "triggers": [
+                    {
+                        "type": "GitHub",
+                        "github": {
+                            "secret": "EYDGXZRiYBDNWaNzIm8y"
+                        }
+                    },
+                    {
+                        "type": "Generic",
+                        "generic": {
+                            "secret": "T_SE3VdNUEGGN7LHx_fO"
+                        }
+                    }
+                ],
+                "source": {
+                    "type": "Git",
+                    "git": {
+                        "uri": "https://github.com/redhat-helloworld-msa/frontend"
+                    }
+                },
+                "strategy": {
+                    "type": "Source",
+                    "sourceStrategy": {
+                        "from": {
+                            "kind": "ImageStreamTag",
+                            "namespace": "openshift",
+                            "name": "nodejs:latest"
+                        }
+                    }
+                },
+                "output": {
+                    "to": {
+                        "kind": "ImageStreamTag",
+                        "name": "frontend:latest"
+                    }
+                }
+            }
+        },
+        {
+            "kind": "BuildConfig",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "hello",
+                "labels": {
+                    "hystrix.enabled": "true"
+                }
+            },
+            "spec": {
+                "triggers": [
+                    {
+                        "type": "GitHub",
+                        "github": {
+                            "secret": "ErjM8rz4midkWptrIhnb"
+                        }
+                    },
+                    {
+                        "type": "Generic",
+                        "generic": {
+                            "secret": "z7e_noBwVD1jw2aao55Q"
+                        }
+                    }
+                ],
+                "source": {
+                    "type": "Git",
+                    "git": {
+                        "uri": "https://github.com/redhat-helloworld-msa/hello"
+                    }
+                },
+                "strategy": {
+                    "type": "Source",
+                    "sourceStrategy": {
+                        "from": {
+                            "kind": "ImageStreamTag",
+                            "namespace": "helloworld-msa",
+                            "name": "jboss-eap70-openshift:1.3-Beta"
+                        }
+                    }
+                },
+                "output": {
+                    "to": {
+                        "kind": "ImageStreamTag",
+                        "name": "hello:latest"
+                    }
+                }
+            }
+        },
+        {
+            "kind": "BuildConfig",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "hola",
+                "labels": {
+                    "hystrix.enabled": "true"
+                }
+            },
+            "spec": {
+                "triggers": [
+                    {
+                        "type": "GitHub",
+                        "github": {
+                            "secret": "VvhfSWbm8Rth-8w7B-yK"
+                        }
+                    },
+                    {
+                        "type": "Generic",
+                        "generic": {
+                            "secret": "80ZMKshZnpubM8GMz1Dm"
+                        }
+                    }
+                ],
+                "source": {
+                    "type": "Git",
+                    "git": {
+                        "uri": "https://github.com/redhat-helloworld-msa/hola"
+                    }
+                },
+                "strategy": {
+                    "type": "Source",
+                    "sourceStrategy": {
+                        "from": {
+                            "kind": "ImageStreamTag",
+                            "namespace": "helloworld-msa",
+                            "name": "wildflyswarm-10-centos7:latest"
+                        }
+                    }
+                },
+                "output": {
+                    "to": {
+                        "kind": "ImageStreamTag",
+                        "name": "hola:latest"
+                    }
+                }
+            }
+        },
+        {
+            "kind": "BuildConfig",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "namaste",
+                "labels": {
+                    "build": "namaste"
+                }
+            },
+            "spec": {
+                "triggers": [
+                    {
+                        "type": "GitHub",
+                        "github": {
+                            "secret": "5e-CkYgE32IGrgrUlm0R"
+                        }
+                    },
+                    {
+                        "type": "Generic",
+                        "generic": {
+                            "secret": "zowKTBBi2iQ805301WIB"
+                        }
+                    }
+                ],
+                "source": {
+                    "type": "Binary",
+                    "binary": {}
+                },
+                "strategy": {
+                    "type": "Docker",
+                    "dockerStrategy": {}
+                },
+                "output": {
+                    "to": {
+                        "kind": "ImageStreamTag",
+                        "name": "namaste:latest"
+                    }
+                }
+            }
+        },
+        {
+            "kind": "BuildConfig",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "ola",
+                "labels": {
+                    "build": "ola"
+                }
+            },
+            "spec": {
+                "triggers": [
+                    {
+                        "type": "GitHub",
+                        "github": {
+                            "secret": "0zHOIoKTekRJ8KT9yQmj"
+                        }
+                    },
+                    {
+                        "type": "Generic",
+                        "generic": {
+                            "secret": "R8HTMp6GgWRa6it2sOoi"
+                        }
+                    }
+                ],
+                "source": {
+                    "type": "Binary",
+                    "binary": {}
+                },
+                "strategy": {
+                    "type": "Docker",
+                    "dockerStrategy": {}
+                },
+                "output": {
+                    "to": {
+                        "kind": "ImageStreamTag",
+                        "name": "ola:latest"
+                    }
+                }
+            }
+        },
+        {
+            "kind": "DeploymentConfig",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "aloha",
+                "labels": {
+                    "hystrix.enabled": "true"
+                }
+            },
+            "spec": {
+                "triggers": [
+                    {
+                        "type": "ConfigChange"
+                    },
+                    {
+                        "type": "ImageChange",
+                        "imageChangeParams": {
+                            "automatic": true,
+                            "containerNames": [
+                                "aloha"
+                            ],
+                            "from": {
+                                "kind": "ImageStreamTag",
+                                "name": "aloha:latest"
+                            }
+                        }
+                    }
+                ],
+                "replicas": 1,
+                "selector": {
+                    "deploymentconfig": "aloha",
+                    "hystrix.enabled": "true"
+                },
+                "template": {
+                    "metadata": {
+                        "labels": {
+                            "deploymentconfig": "aloha",
+                            "hystrix.enabled": "true"
+                        }
+                    },
+                    "spec": {
+                        "containers": [
+                            {
+                                "name": "aloha",
+                                "image": "redhatmsa/aloha",
+                                "ports": [
+                                    {
+                                        "containerPort": 5701,
+                                        "protocol": "TCP"
+                                    },
+                                    {
+                                        "containerPort": 8778,
+                                        "protocol": "TCP",
+                                        "name": "jolokia"
+                                    },
+                                    {
+                                        "containerPort": 8080,
+                                        "protocol": "TCP"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "kind": "DeploymentConfig",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "api-gateway",
+                "labels": {
+                    "hystrix.enabled": "true"
+                }
+            },
+            "spec": {
+                "triggers": [
+                    {
+                        "type": "ConfigChange"
+                    },
+                    {
+                        "type": "ImageChange",
+                        "imageChangeParams": {
+                            "automatic": true,
+                            "containerNames": [
+                                "api-gateway"
+                            ],
+                            "from": {
+                                "kind": "ImageStreamTag",
+                                "namespace": "helloworld-msa",
+                                "name": "api-gateway:latest"
+                            }
+                        }
+                    }
+                ],
+                "replicas": 1,
+                "selector": {
+                    "deploymentconfig": "api-gateway",
+                    "hystrix.enabled": "true"
+                },
+                "template": {
+                    "metadata": {
+                        "labels": {
+                            "deploymentconfig": "api-gateway",
+                            "hystrix.enabled": "true"
+                        }
+                    },
+                    "spec": {
+                        "containers": [
+                            {
+                                "name": "api-gateway",
+                                "image": "redhatmsa/api-gateway",
+                                "ports": [
+                                    {
+                                        "containerPort": 8778,
+                                        "protocol": "TCP",
+                                        "name": "jolokia"
+                                    },
+                                    {
+                                        "containerPort": 8080,
+                                        "protocol": "TCP"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "kind": "DeploymentConfig",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "bonjour",
+                "labels": {
+                    "app": "bonjour"
+                }
+            },
+            "spec": {
+                "triggers": [
+                    {
+                        "type": "ConfigChange"
+                    },
+                    {
+                        "type": "ImageChange",
+                        "imageChangeParams": {
+                            "automatic": true,
+                            "containerNames": [
+                                "bonjour"
+                            ],
+                            "from": {
+                                "kind": "ImageStreamTag",
+                                "name": "bonjour:latest"
+                            }
+                        }
+                    }
+                ],
+                "replicas": 1,
+                "selector": {
+                    "app": "bonjour",
+                    "deploymentconfig": "bonjour"
+                },
+                "template": {
+                    "metadata": {
+                        "labels": {
+                            "app": "bonjour",
+                            "deploymentconfig": "bonjour"
+                        }
+                    },
+                    "spec": {
+                        "containers": [
+                            {
+                                "name": "bonjour",
+                                "image": "redhatmsa/bonjour",
+                                "ports": [
+                                    {
+                                        "containerPort": 8080,
+                                        "protocol": "TCP"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "kind": "DeploymentConfig",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "frontend",
+                "labels": {
+                    "app": "frontend"
+                }
+            },
+            "spec": {
+                "triggers": [
+                    {
+                        "type": "ConfigChange"
+                    },
+                    {
+                        "type": "ImageChange",
+                        "imageChangeParams": {
+                            "automatic": true,
+                            "containerNames": [
+                                "frontend"
+                            ],
+                            "from": {
+                                "kind": "ImageStreamTag",
+                                "name": "frontend:latest"
+                            }
+                        }
+                    }
+                ],
+                "replicas": 1,
+                "selector": {
+                    "app": "frontend",
+                    "deploymentconfig": "frontend"
+                },
+                "template": {
+                    "metadata": {
+                        "labels": {
+                            "app": "frontend",
+                            "deploymentconfig": "frontend"
+                        }
+                    },
+                    "spec": {
+                        "containers": [
+                            {
+                                "name": "frontend",
+                                "image": "redhatmsa/frontend",
+                                "ports": [
+                                    {
+                                        "containerPort": 8080,
+                                        "protocol": "TCP"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "kind": "DeploymentConfig",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "hello",
+                "labels": {
+                    "hystrix.enabled": "true"
+                }
+            },
+            "spec": {
+                "triggers": [
+                    {
+                        "type": "ConfigChange"
+                    },
+                    {
+                        "type": "ImageChange",
+                        "imageChangeParams": {
+                            "automatic": true,
+                            "containerNames": [
+                                "hello"
+                            ],
+                            "from": {
+                                "kind": "ImageStreamTag",
+                                "name": "hello:latest"
+                            }
+                        }
+                    }
+                ],
+                "replicas": 1,
+                "selector": {
+                    "deploymentconfig": "hello",
+                    "hystrix.enabled": "true"
+                },
+                "template": {
+                    "metadata": {
+                        "labels": {
+                            "deploymentconfig": "hello",
+                            "hystrix.enabled": "true"
+                        }
+                    },
+                    "spec": {
+                        "containers": [
+                            {
+                                "name": "hello",
+                                "image": "redhatmsa/hello",
+                                "ports": [
+                                    {
+                                        "containerPort": 8080,
+                                        "protocol": "TCP"
+                                    },
+                                    {
+                                        "containerPort": 8443,
+                                        "protocol": "TCP"
+                                    },
+                                    {
+                                        "containerPort": 8778,
+                                        "protocol": "TCP",
+                                        "name": "jolokia"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "kind": "DeploymentConfig",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "hola",
+                "labels": {
+                    "hystrix.enabled": "true"
+                }
+            },
+            "spec": {
+                "triggers": [
+                    {
+                        "type": "ConfigChange"
+                    },
+                    {
+                        "type": "ImageChange",
+                        "imageChangeParams": {
+                            "automatic": true,
+                            "containerNames": [
+                                "hola"
+                            ],
+                            "from": {
+                                "kind": "ImageStreamTag",
+                                "name": "hola:latest"
+                            }
+                        }
+                    }
+                ],
+                "replicas": 1,
+                "selector": {
+                    "deploymentconfig": "hola",
+                    "hystrix.enabled": "true"
+                },
+                "template": {
+                    "metadata": {
+                        "labels": {
+                            "deploymentconfig": "hola",
+                            "hystrix.enabled": "true"
+                        }
+                    },
+                    "spec": {
+                        "containers": [
+                            {
+                                "name": "hola",
+                                "image": "redhatmsa/hola",
+                                "ports": [
+                                    {
+                                        "containerPort": 8080,
+                                        "protocol": "TCP"
+                                    },
+                                    {
+                                        "containerPort": 8778,
+                                        "protocol": "TCP",
+                                        "name": "jolokia"
+                                    },
+                                    {
+                                        "containerPort": 8888,
+                                        "protocol": "TCP"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "kind": "DeploymentConfig",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "namaste",
+                "labels": {
+                    "hystrix.enabled": "true"
+                }
+            },
+            "spec": {
+                "triggers": [
+                    {
+                        "type": "ConfigChange"
+                    },
+                    {
+                        "type": "ImageChange",
+                        "imageChangeParams": {
+                            "automatic": true,
+                            "containerNames": [
+                                "namaste"
+                            ],
+                            "from": {
+                                "kind": "ImageStreamTag",
+                                "namespace": "helloworld-msa",
+                                "name": "namaste:latest"
+                            }
+                        }
+                    }
+                ],
+                "replicas": 1,
+                "selector": {
+                    "deploymentconfig": "namaste",
+                    "hystrix.enabled": "true"
+                },
+                "template": {
+                    "metadata": {
+                        "labels": {
+                            "deploymentconfig": "namaste",
+                            "hystrix.enabled": "true"
+                        }
+                    },
+                    "spec": {
+                        "containers": [
+                            {
+                                "name": "namaste",
+                                "image": "redhatmsa/namaste",
+                                "ports": [
+                                    {
+                                        "containerPort": 8778,
+                                        "protocol": "TCP",
+                                        "name": "jolokia"
+                                    },
+                                    {
+                                        "containerPort": 8080,
+                                        "protocol": "TCP"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "kind": "DeploymentConfig",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "ola",
+                "labels": {
+                    "hystrix.enabled": "true"
+                }
+            },
+            "spec": {
+                "triggers": [
+                    {
+                        "type": "ConfigChange"
+                    },
+                    {
+                        "type": "ImageChange",
+                        "imageChangeParams": {
+                            "automatic": true,
+                            "containerNames": [
+                                "ola"
+                            ],
+                            "from": {
+                                "kind": "ImageStreamTag",
+                                "namespace": "helloworld-msa",
+                                "name": "ola:latest"
+                            }
+                        }
+                    }
+                ],
+                "replicas": 1,
+                "selector": {
+                    "deploymentconfig": "ola",
+                    "hystrix.enabled": "true"
+                },
+                "template": {
+                    "metadata": {
+                        "labels": {
+                            "deploymentconfig": "ola",
+                            "hystrix.enabled": "true"
+                        }
+                    },
+                    "spec": {
+                        "containers": [
+                            {
+                                "name": "ola",
+                                "image": "redhatmsa/ola",
+                                "ports": [
+                                    {
+                                        "containerPort": 8778,
+                                        "protocol": "TCP",
+                                        "name": "jolokia"
+                                    },
+                                    {
+                                        "containerPort": 8080,
+                                        "protocol": "TCP"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "kind": "Service",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "aloha",
+                "labels": {
+                    "hystrix.enabled": "true"
+                }
+            },
+            "spec": {
+                "ports": [
+                    {
+                        "name": "8778-tcp",
+                        "protocol": "TCP",
+                        "port": 8778,
+                        "targetPort": 8778
+                    },
+                    {
+                        "name": "8080-tcp",
+                        "protocol": "TCP",
+                        "port": 8080,
+                        "targetPort": 8080
+                    }
+                ],
+                "selector": {
+                    "deploymentconfig": "aloha",
+                    "hystrix.enabled": "true"
+                },
+                "type": "ClusterIP",
+                "sessionAffinity": "None"
+            }
+        },
+        {
+            "kind": "Service",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "api-gateway",
+                "labels": {
+                    "hystrix.enabled": "true"
+                }
+            },
+            "spec": {
+                "ports": [
+                    {
+                        "name": "8778-tcp",
+                        "protocol": "TCP",
+                        "port": 8778,
+                        "targetPort": 8778
+                    },
+                    {
+                        "name": "8080-tcp",
+                        "protocol": "TCP",
+                        "port": 8080,
+                        "targetPort": 8080
+                    }
+                ],
+                "selector": {
+                    "deploymentconfig": "api-gateway",
+                    "hystrix.enabled": "true"
+                },
+                "type": "ClusterIP",
+                "sessionAffinity": "None"
+            }
+        },
+        {
+            "kind": "Service",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "bonjour",
+                "labels": {
+                    "app": "bonjour"
+                }
+            },
+            "spec": {
+                "ports": [
+                    {
+                        "name": "8080-tcp",
+                        "protocol": "TCP",
+                        "port": 8080,
+                        "targetPort": 8080
+                    }
+                ],
+                "selector": {
+                    "app": "bonjour",
+                    "deploymentconfig": "bonjour"
+                },
+                "type": "ClusterIP",
+                "sessionAffinity": "None"
+            }
+        },
+        {
+            "kind": "Service",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "frontend",
+                "labels": {
+                    "app": "frontend"
+                }
+            },
+            "spec": {
+                "ports": [
+                    {
+                        "name": "8080-tcp",
+                        "protocol": "TCP",
+                        "port": 8080,
+                        "targetPort": 8080
+                    }
+                ],
+                "selector": {
+                    "app": "frontend",
+                    "deploymentconfig": "frontend"
+                },
+                "type": "ClusterIP",
+                "sessionAffinity": "None"
+            }
+        },
+        {
+            "kind": "Service",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "hello",
+                "labels": {
+                    "hystrix.enabled": "true"
+                }
+            },
+            "spec": {
+                "ports": [
+                    {
+                        "name": "8080-tcp",
+                        "protocol": "TCP",
+                        "port": 8080,
+                        "targetPort": 8080
+                    },
+                    {
+                        "name": "8443-tcp",
+                        "protocol": "TCP",
+                        "port": 8443,
+                        "targetPort": 8443
+                    },
+                    {
+                        "name": "8778-tcp",
+                        "protocol": "TCP",
+                        "port": 8778,
+                        "targetPort": 8778
+                    }
+                ],
+                "selector": {
+                    "deploymentconfig": "hello",
+                    "hystrix.enabled": "true"
+                },
+                "type": "ClusterIP"
+            }
+        },
+        {
+            "kind": "Service",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "hola",
+                "labels": {
+                    "hystrix.enabled": "true"
+                }
+            },
+            "spec": {
+                "ports": [
+                    {
+                        "name": "8080-tcp",
+                        "protocol": "TCP",
+                        "port": 8080,
+                        "targetPort": 8080
+                    },
+                    {
+                        "name": "8778-tcp",
+                        "protocol": "TCP",
+                        "port": 8778,
+                        "targetPort": 8778
+                    },
+                    {
+                        "name": "8888-tcp",
+                        "protocol": "TCP",
+                        "port": 8888,
+                        "targetPort": 8888
+                    }
+                ],
+                "selector": {
+                    "deploymentconfig": "hola",
+                    "hystrix.enabled": "true"
+                },
+                "type": "ClusterIP"
+            }
+        },
+        {
+            "kind": "Service",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "namaste",
+                "labels": {
+                    "hystrix.enabled": "true"
+                }
+            },
+            "spec": {
+                "ports": [
+                    {
+                        "name": "8778-tcp",
+                        "protocol": "TCP",
+                        "port": 8778,
+                        "targetPort": 8778
+                    },
+                    {
+                        "name": "8080-tcp",
+                        "protocol": "TCP",
+                        "port": 8080,
+                        "targetPort": 8080
+                    }
+                ],
+                "selector": {
+                    "deploymentconfig": "namaste",
+                    "hystrix.enabled": "true"
+                },
+                "type": "ClusterIP"
+            }
+        },
+        {
+            "kind": "Service",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "ola",
+                "creationTimestamp": null,
+                "labels": {
+                    "hystrix.enabled": "true"
+                }
+            },
+            "spec": {
+                "ports": [
+                    {
+                        "name": "8778-tcp",
+                        "protocol": "TCP",
+                        "port": 8778,
+                        "targetPort": 8778
+                    },
+                    {
+                        "name": "8080-tcp",
+                        "protocol": "TCP",
+                        "port": 8080,
+                        "targetPort": 8080
+                    }
+                ],
+                "selector": {
+                    "deploymentconfig": "ola",
+                    "hystrix.enabled": "true"
+                },
+                "type": "ClusterIP"
+            }
+        },
+        {
+            "kind": "Route",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "aloha",
+                "labels": {
+                    "hystrix.enabled": "true"
+                }
+            },
+            "spec": {
+                "host": "aloha-helloworld-msa.rhel-cdk.10.1.2.2.xip.io",
+                "to": {
+                    "kind": "Service",
+                    "name": "aloha"
+                }
+            }
+        },
+        {
+            "kind": "Route",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "api-gateway",
+                "labels": {
+                    "hystrix.enabled": "true"
+                }
+            },
+            "spec": {
+                "host": "api-gateway-helloworld-msa.rhel-cdk.10.1.2.2.xip.io",
+                "to": {
+                    "kind": "Service",
+                    "name": "api-gateway"
+                },
+                "port": {
+                    "targetPort": "8080-tcp"
+                }
+            }
+        },
+        {
+            "kind": "Route",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "bonjour",
+                "labels": {
+                    "app": "bonjour"
+                }
+            },
+            "spec": {
+                "host": "bonjour-helloworld-msa.rhel-cdk.10.1.2.2.xip.io",
+                "to": {
+                    "kind": "Service",
+                    "name": "bonjour"
+                },
+                "port": {
+                    "targetPort": "8080-tcp"
+                }
+            }
+        },
+        {
+            "kind": "Route",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "frontend",
+                "labels": {
+                    "app": "frontend"
+                }
+            },
+            "spec": {
+                "host": "frontend-helloworld-msa.rhel-cdk.10.1.2.2.xip.io",
+                "to": {
+                    "kind": "Service",
+                    "name": "frontend"
+                },
+                "port": {
+                    "targetPort": "8080-tcp"
+                }
+            }
+        },
+        {
+            "kind": "Route",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "hello",
+                "labels": {
+                    "hystrix.enabled": "true"
+                }
+            },
+            "spec": {
+                "host": "hello-helloworld-msa.rhel-cdk.10.1.2.2.xip.io",
+                "to": {
+                    "kind": "Service",
+                    "name": "hello"
+                },
+                "port": {
+                    "targetPort": "8080-tcp"
+                }
+            }
+        },
+        {
+            "kind": "Route",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "hola",
+                "labels": {
+                    "hystrix.enabled": "true"
+                }
+            },
+            "spec": {
+                "host": "hola-helloworld-msa.rhel-cdk.10.1.2.2.xip.io",
+                "to": {
+                    "kind": "Service",
+                    "name": "hola"
+                },
+                "port": {
+                    "targetPort": "8080-tcp"
+                }
+            }
+        },
+        {
+            "kind": "Route",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "namaste",
+                "labels": {
+                    "hystrix.enabled": "true"
+                }
+            },
+            "spec": {
+                "host": "namaste-helloworld-msa.rhel-cdk.10.1.2.2.xip.io",
+                "to": {
+                    "kind": "Service",
+                    "name": "namaste"
+                },
+                "port": {
+                    "targetPort": "8080-tcp"
+                }
+            }
+        },
+        {
+            "kind": "Route",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "ola",
+                "labels": {
+                    "hystrix.enabled": "true"
+                }
+            },
+            "spec": {
+                "host": "ola-helloworld-msa.rhel-cdk.10.1.2.2.xip.io",
+                "to": {
+                    "kind": "Service",
+                    "name": "ola"
+                },
+                "port": {
+                    "targetPort": "8080-tcp"
+                }
+            }
+        },
+        {
+            "kind": "ServiceAccount",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "ribbon",
+                "labels": {
+                    "package": "kubeflix"
+                }
+            },
+            "secrets": [
+                {
+                    "name": "ribbon-token-vohbw"
+                },
+                {
+                    "name": "ribbon-dockercfg-lvesi"
+                }
+            ],
+            "imagePullSecrets": [
+                {
+                    "name": "ribbon-dockercfg-lvesi"
+                }
+            ]
+        },
+        {
+            "kind": "ServiceAccount",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "turbine",
+                "labels": {
+                    "package": "kubeflix"
+                }
+            },
+            "secrets": [
+                {
+                    "name": "turbine-token-cjsnb"
+                },
+                {
+                    "name": "turbine-dockercfg-rhlpg"
+                }
+            ],
+            "imagePullSecrets": [
+                {
+                    "name": "turbine-dockercfg-rhlpg"
+                }
+            ]
+        },
+        {
+            "kind": "ReplicationController",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "hystrix-dashboard",
+                "labels": {
+                    "group": "io.fabric8.kubeflix",
+                    "package": "kubeflix",
+                    "project": "hystrix-dashboard",
+                    "provider": "fabric8",
+                    "version": "1.0.15"
+                }
+            },
+            "spec": {
+                "replicas": 1,
+                "selector": {
+                    "group": "io.fabric8.kubeflix",
+                    "project": "hystrix-dashboard",
+                    "provider": "fabric8",
+                    "version": "1.0.15"
+                },
+                "template": {
+                    "metadata": {
+                        "creationTimestamp": null,
+                        "labels": {
+                            "group": "io.fabric8.kubeflix",
+                            "package": "kubeflix",
+                            "project": "hystrix-dashboard",
+                            "provider": "fabric8",
+                            "version": "1.0.15"
+                        }
+                    },
+                    "spec": {
+                        "containers": [
+                            {
+                                "name": "hystrix-dashboard",
+                                "image": "fabric8/hystrix-dashboard:1.0.15",
+                                "ports": [
+                                    {
+                                        "name": "http",
+                                        "containerPort": 8080,
+                                        "protocol": "TCP"
+                                    }
+                                ],
+                                "env": [
+                                    {
+                                        "name": "KUBERNETES_NAMESPACE",
+                                        "valueFrom": {
+                                            "fieldRef": {
+                                                "apiVersion": "v1",
+                                                "fieldPath": "metadata.namespace"
+                                            }
+                                        }
+                                    }
+                                ]
+                            }
+                        ],
+                        "serviceAccountName": "ribbon",
+                        "serviceAccount": "ribbon"
+                    }
+                }
+            },
+            "status": {
+                "replicas": 1,
+                "observedGeneration": 1
+            }
+        },
+        {
+            "kind": "ReplicationController",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "turbine-server",
+                "labels": {
+                    "group": "io.fabric8.kubeflix",
+                    "package": "kubeflix",
+                    "project": "turbine-server",
+                    "provider": "fabric8",
+                    "version": "1.0.15"
+                }
+            },
+            "spec": {
+                "replicas": 1,
+                "selector": {
+                    "group": "io.fabric8.kubeflix",
+                    "project": "turbine-server",
+                    "provider": "fabric8",
+                    "version": "1.0.15"
+                },
+                "template": {
+                    "metadata": {
+                        "creationTimestamp": null,
+                        "labels": {
+                            "group": "io.fabric8.kubeflix",
+                            "package": "kubeflix",
+                            "project": "turbine-server",
+                            "provider": "fabric8",
+                            "version": "1.0.15"
+                        }
+                    },
+                    "spec": {
+                        "containers": [
+                            {
+                                "name": "turbine-server",
+                                "image": "fabric8/turbine-server:1.0.15",
+                                "ports": [
+                                    {
+                                        "name": "http",
+                                        "containerPort": 8080,
+                                        "protocol": "TCP"
+                                    },
+                                    {
+                                        "name": "jolokia",
+                                        "containerPort": 8778,
+                                        "protocol": "TCP"
+                                    }
+                                ],
+                                "env": [
+                                    {
+                                        "name": "KUBERNETES_NAMESPACE",
+                                        "valueFrom": {
+                                            "fieldRef": {
+                                                "apiVersion": "v1",
+                                                "fieldPath": "metadata.namespace"
+                                            }
+                                        }
+                                    }
+                                ]
+                            }
+                        ],
+                        "serviceAccountName": "turbine",
+                        "serviceAccount": "turbine"
+                    }
+                }
+            },
+            "status": {
+                "replicas": 1,
+                "observedGeneration": 1
+            }
+        },
+        {
+                    "kind": "Service",
+                    "apiVersion": "v1",
+                    "metadata": {
+                        "name": "hystrix-dashboard",
+                        "labels": {
+                            "group": "io.fabric8.kubeflix",
+                            "package": "kubeflix",
+                            "project": "hystrix-dashboard",
+                            "provider": "fabric8",
+                            "version": "1.0.15"
+                        }
+                    },
+                    "spec": {
+                        "ports": [
+                            {
+                                "protocol": "TCP",
+                                "port": 80,
+                                "targetPort": 8080
+                            }
+                        ],
+                        "selector": {
+                            "group": "io.fabric8.kubeflix",
+                            "project": "hystrix-dashboard",
+                            "provider": "fabric8"
+                        }
+                    }
+                },
+                {
+                    "kind": "Service",
+                    "apiVersion": "v1",
+                    "metadata": {
+                        "name": "turbine-server",
+                        "labels": {
+                            "group": "io.fabric8.kubeflix",
+                            "package": "kubeflix",
+                            "project": "turbine-server",
+                            "provider": "fabric8",
+                            "version": "1.0.15"
+                        }
+                    },
+                    "spec": {
+                        "ports": [
+                            {
+                                "protocol": "TCP",
+                                "port": 80,
+                                "targetPort": 8080
+                            }
+                        ],
+                        "selector": {
+                            "group": "io.fabric8.kubeflix",
+                            "project": "turbine-server",
+                            "provider": "fabric8"
+                        }
+                    }
+                },
+                {
+                    "kind": "Route",
+                    "apiVersion": "v1",
+                    "metadata": {
+                        "name": "hystrix-dashboard",
+                        "labels": {
+                            "group": "io.fabric8.kubeflix",
+                            "package": "kubeflix",
+                            "project": "hystrix-dashboard",
+                            "provider": "fabric8",
+                            "version": "1.0.15"
+                        }
+                    },
+                    "spec": {
+                        "host": "hystrix-dashboard-helloworld-msa.rhel-cdk.10.1.2.2.xip.io",
+                        "to": {
+                            "kind": "Service",
+                            "name": "hystrix-dashboard"
+                        }
+                    }
+                }
+        ]
+}

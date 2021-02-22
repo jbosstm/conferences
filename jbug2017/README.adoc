@@ -2,6 +2,9 @@
 
 https://developer.jboss.org/groups/jbugcz?view=documents
 
+NOTE: The quickstart has been updated since it was originally presented.
+      The changes bring it closer in line with https://github.com/jbosstm/conferences/blob/master/rules.md[jbosstm/conferences#rules.md] at the time these changes were made.
+
 * The talk presents Narayana LRA for usage in microservice architecture.
 * It shows difference of Saga concept to distributed transactions (shown
   in the helloworld demo where WildFly servers communicates with each other
@@ -27,4 +30,4 @@ https://developer.jboss.org/groups/jbugcz?view=documents
 .  Second expects to be run and shown on OpenShift and settings is described at
    https://developer.jboss.org/wiki/MSAQuickstartsWithLRAREST-ATOnMinishift .
    You will need a OpenShift started probably locally (check https://www.openshift.org/minishift[Minishift])
-   and run the ansible recipe from https://github.com/ochaloup/helloworld-msa/tree/lra
+   and run the ansible recipe from https://github.com/jbosstm/conferences/tree/master/jbug2017/helloworld-msa

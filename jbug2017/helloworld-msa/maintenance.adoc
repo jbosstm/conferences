@@ -1,0 +1,40 @@
+// JBoss, Home of Professional Open Source
+// Copyright 2016, Red Hat, Inc. and/or its affiliates, and individual
+// contributors by the @authors tag. See the copyright.txt in the
+// distribution for a full listing of individual contributors.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+// http://www.apache.org/licenses/LICENSE-2.0
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+## Maintenance (Only for redhatmsa admins)
+
+### Deploy the microservices images to Docker Hub 
+
+To deploy the microservices images you have to run the following commands from inside the vagrant box (vagrant ssh):
+
+----
+# vagrant ssh
+
+
+# due to a new docker.io registry, you will need to specify the v1 version
+ 
+# vi ~/.docker/config.json
+# replace "docker.io"
+# by "https://index.docker.io/v1/"
+
+$ oc login  -u admin -p admin localhost --insecure-skip-tls-verify=true
+$ oc project default
+
+#### use the email and password of redhatmsa ####
+$ docker login  #login with user redhatmsa
+
+$ registry=`oc get service docker-registry --template '{{.spec.portalIP}}'`; declare -a arr=("bonjour" "frontend"); for i in "${arr[@]}"; do image=`docker images $registry:5000/helloworld-msa/$i|awk 'NR==2'`; echo "Taging $image"; id=$(echo $image|awk '{print $3}'); docker tag -f $id docker.io/redhatmsa/$i; echo "Pushing $id from $image"; docker push -f docker.io/redhatmsa/$i; done; declare -a arr2=("hello" "hola" "aloha" "ola" "namaste" "api-gateway"); for i in "${arr2[@]}"; do image=`docker images redhatmsa/$i|awk 'NR==2'`; echo "Taging $image"; id=$(echo $image|awk '{print $3}'); docker tag -f $id docker.io/redhatmsa/$i:latest; echo "Pushing $id from $image"; docker push -f docker.io/redhatmsa/$i:latest; done
+----
+

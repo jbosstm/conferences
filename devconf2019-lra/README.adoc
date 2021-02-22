@@ -6,6 +6,9 @@ Base concept of transaction handling of the LRA specification is https://www.cs.
 Saga pattern is designed to provide transactional guarantees for long running transactions
 which is a good fit for the microservice architecture.
 
+NOTE: The quickstart has been updated since it was originally presented.
+      The changes bring it closer in line with https://github.com/jbosstm/conferences/blob/master/rules.md[jbosstm/conferences#rules.md] at the time these changes were made.
+
 LRA is based on HTTP-REST communication.
 Our implementation in http://narayana.io[Narayana] expects a LRA HTTP coordination endpoints to be available.
 
@@ -24,7 +27,7 @@ To running this you will need
 * run LRA coordinator
 * build and start this demo application
 
-NOTE: there are prepared docker images for easier startup, https://github.com/ochaloup/devconf2019-lra#running-this-example-with-prepared-docker-images[see later down here]
+NOTE: there are prepared docker images for easier startup, https://github.com/jbosstm/conferences/tree/master/devconf2019-lra#running-this-example-with-prepared-docker-images[see later down here]
 
 [NOTE]
 ====
@@ -70,8 +73,8 @@ and the coordinator is running you can run this demo app.
 The demo application starts as a Thorntail application which exposes
 endpoit to book a flight.
 
-* `git clone https://github.com/ochaloup/devconf2019-lra.git`
-* `cd devconf2019-lra`
+* `git clone https://github.com/jbosstm/conferences`
+* `cd conferences/devconf2019-lra`
 * `mvn package`
 * `java -jar target/devconf2019-flightbooking-thorntail.jar -Dinit.csv=./flight.data -Dlra.http.host=localhost -Dlra.http.port=8180`
 

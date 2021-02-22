@@ -1,0 +1,10 @@
+---
+- name: Install Kubeflix
+  shell: "oc env dc/frontend ENABLE_HYSTRIX=true; oc process -f http://central.maven.org/maven2/io/fabric8/kubeflix/packages/kubeflix/1.0.17/kubeflix-1.0.17-kubernetes.yml |oc create -f - && oc expose service hystrix-dashboard --port=8080 --hostname=hystrix-dashboard-{{ project_name }}.{{ domain }} && oc policy add-role-to-user admin system:serviceaccount:{{ project_name }}:turbine"
+  when: "{{ deploy_hystrix }}"
+  register: command_result
+  failed_when: "'exists' not in command_result.stderr and command_result.rc != 0"
+  changed_when: "'exists' not in command_result.stderr"
+  tags:
+    - openshift
+    - hystrix

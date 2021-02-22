@@ -1,0 +1,41 @@
+{
+  "name": "bonjour",
+  "version": "1.0.0",
+  "description": "Bonjour microservice running on NodeJS",
+  "main": "bonjour.js",
+  "scripts": {
+    "start": "node bonjour.js",
+    "lint": "eslint bonjour.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/redhat-helloworld-msa/bonjour.git"
+  },
+  "author": "developer@redhat.com",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/redhat-helloworld-msa/bonjour/issues"
+  },
+  "homepage": "https://github.com/redhat-helloworld-msa/bonjour#readme",
+  "dependencies": {
+    "es6-shim": "^0.35.1",
+    "express": "^4.13.4",
+    "express-session": "^1.14.2",
+    "jaeger-client": "^3.5.2",
+    "keycloak-auth-utils": "2.4.0",
+    "keycloak-connect": "^2.4.0",
+    "opentracing": "^0.13.0",
+    "opossum": "^0.5.1",
+    "roi": "~0.13.0",
+    "request": "~2.81.0"
+  },
+  "devDependencies": {
+    "eslint": "~3.11.1",
+    "eslint-config-semistandard": "~7.0.0",
+    "eslint-config-standard": "~6.2.1",
+    "eslint-plugin-promise": "~3.4.0",
+    "eslint-plugin-react": "~6.7.1",
+    "eslint-plugin-standard": "~2.0.1",
+    "swagger-express": "~1.0.5"
+  }
+}

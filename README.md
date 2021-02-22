@@ -61,3 +61,14 @@ Event: [JavaOne](https://www.oracle.com/code-one/agenda.html)
 
 Materials: [demonstration code](codeone2019)
 
+## DevConf.cz 2019: Transactional solutions for microservices
+
+Event: [DevConf.cz 2019](https://devconfcz2019.sched.com/event/JcgU/transactional-solutions-for-microservices)
+
+Materials: [presentation slides](devconf2019-lra/Transactional-Solution-For-Microservices-presentation.pdf)
+
+## DevConf.cz 2021: Narayana: Java library for transaction processing
+
+Event: [DevConf.cz 2021](https://devconfcz2021.sched.com/event/gmMk/narayana-java-library-for-transaction-processing)
+
+Materials: [presentation slides](devconf2021-narayana/slides.pdf)
