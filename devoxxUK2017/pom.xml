@@ -14,7 +14,7 @@
   <properties>
     <!-- the main class -->
     <exec.mainClass>demo.demo12.VolatileTheatreVerticle</exec.mainClass>
-    <vertx.version>3.5.4</vertx.version>
+    <vertx.version>3.9.4</vertx.version>
     <narayana.version>${project.version}</narayana.version>
     <jboss-logging.version>3.1.4.GA</jboss-logging.version>
   </properties>
