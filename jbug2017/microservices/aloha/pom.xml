@@ -45,7 +45,7 @@
 		<openfeign.version>9.4.0</openfeign.version>
 		<version.opentracing>0.22.0</version.opentracing>
 		<openfeign.opentracing.version>0.0.3</openfeign.opentracing.version>
-		<vertx.version>3.3.3</vertx.version>
+		<vertx.version>3.5.4</vertx.version>
 		<hystrix.version>1.5.1</hystrix.version>
 		<version.exec.plugin>1.4.0</version.exec.plugin>
 		<version.jaeger>0.19.0</version.jaeger>
