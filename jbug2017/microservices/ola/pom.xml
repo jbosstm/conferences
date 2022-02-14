@@ -57,7 +57,7 @@
 		<!-- Setting the image explicity to use redhat-openjdk -->
 		<!-- There is kind of issue honoring JAVA_OPTIONS with fabric8-s2i images -->
 		<fabric8.generator.from>fabric8/s2i-java</fabric8.generator.from>
-		<version.resteasy.client>3.0.14.Final</version.resteasy.client>
+		<version.resteasy.client>4.5.7.Final</version.resteasy.client>
 		<version.narayana>5.7.1.Final</version.narayana>
 	</properties>
 
