@@ -50,7 +50,7 @@
 		<version.exec.plugin>1.4.0</version.exec.plugin>
 		<version.jaeger>0.19.0</version.jaeger>
 		<version.narayana>5.7.1.Final</version.narayana>
-		<version.resteasy.client>4.5.7.Final</version.resteasy.client>
+		<version.resteasy.client>4.6.0.Final</version.resteasy.client>
 	</properties>
 
 	<dependencies>
