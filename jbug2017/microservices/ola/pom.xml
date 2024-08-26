@@ -52,7 +52,7 @@
 		<io.opentracing.version>0.22.0</io.opentracing.version>
 		<io.opentracing.contrib.spring.autoconfigure.version>0.0.4</io.opentracing.contrib.spring.autoconfigure.version>
 		<swagger.version>1.5.8</swagger.version>
-		<springfox.version>2.4.0</springfox.version>
+		<springfox.version>2.10.0</springfox.version>
 		<version.jaeger>0.19.0</version.jaeger>
 		<!-- Setting the image explicity to use redhat-openjdk -->
 		<!-- There is kind of issue honoring JAVA_OPTIONS with fabric8-s2i images -->
