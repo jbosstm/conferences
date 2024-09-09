@@ -1,3 +1,7 @@
+# WARNING
+
+The project team do not commit to update the dependencies in this project and as such may contain serious defects or security issues. Please review the examples and perform any maintenance needed before executing the example!
+
 # Conferences
 
 Conference presentation materials (slides, demonstration code, etc)
