@@ -2,6 +2,10 @@
 
 The project team do not commit to update the dependencies in this project and as such may contain serious defects or security issues. Please review the examples and perform any maintenance needed before executing the example!
 
+# Need help?
+
+Please provide reports of issues with the examples at https://issues.redhat.com/browse/JBTM, or if you would like to discuss/provide feedback then please use our User Forum: https://groups.google.com/g/narayana-users
+
 # Conferences
 
 Conference presentation materials (slides, demonstration code, etc)
